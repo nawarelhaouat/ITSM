@@ -1,0 +1,78 @@
+<ui:composition template="/WEB-INF/templates/layoutDeclarant.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <div class="page-title">Mon Profil</div>
+                <div class="page-subtitle">Gérer mes informations personnelles</div>
+            </div>
+        </div>
+
+        <!-- CARD -->
+        <div class="card">
+
+            <div class="card-header">
+                <span class="card-title">Informations utilisateur</span>
+            </div>
+
+            <div class="card-body">
+
+                <h:form>
+
+                    <!-- NOM -->
+                    <div class="form-group">
+                        <label class="form-label">Nom</label>
+                        <h:inputText value="#{loginBean.user.nom}"
+                                     styleClass="form-control"/>
+                    </div>
+
+                    <!-- PRENOM -->
+                    <div class="form-group">
+                        <label class="form-label">Prénom</label>
+                        <h:inputText value="#{loginBean.user.prenom}"
+                                     styleClass="form-control"/>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <h:inputText value="#{loginBean.user.email}"
+                                     styleClass="form-control"
+                                     disabled="true"/>
+                    </div>
+
+                    <!-- ROLE -->
+                    <div class="form-group">
+                        <label class="form-label">Rôle</label>
+                        <h:inputText value="#{loginBean.user.role}"
+                                     styleClass="form-control"
+                                     disabled="true"/>
+                    </div>
+
+                    <!-- BOUTONS -->
+                    <div class="d-flex gap-12 mt-24">
+
+                        <h:commandButton value="Mettre à jour"
+                                         action="#{userBean.updateProfile}"
+                                         styleClass="btn btn-primary"/>
+
+                        <h:link outcome="/user/dashboard"
+                                styleClass="btn btn-secondary">
+                            Retour
+                        </h:link>
+
+                    </div>
+
+                </h:form>
+
+            </div>
+        </div>
+
+    </ui:define>
+</ui:composition>

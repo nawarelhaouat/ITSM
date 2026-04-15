@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition template="/WEB-INF/templates/layoutTechnicien.xhtml">
+<ui:define name="title">Tickets escaladés - ITSM</ui:define>
+<style>
+.page-header{background:#fff;padding:24px;border-radius:15px;margin-bottom:25px;}
+.page-title{font-size:22px;font-weight:700;color:#1E293B;margin-bottom:4px;}
+.page-subtitle{font-size:13px;color:#991B1B;}
+.card{background:#fff;border-radius:15px;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #E2E8F0;overflow:hidden;margin-bottom:20px;}
+.card-header{display:flex;justify-content:space-between;align-items:center;padding:20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;}
+.card-title{font-size:14px;font-weight:600;color:#1E293B;}
+.itsm-table{width:100%;border-collapse:collapse;}
+.itsm-table thead tr{background:linear-gradient(135deg,#FEF2F2,#FFF7ED);}
+.itsm-table th{padding:13px 15px;text-align:left;font-size:11px;font-weight:700;color:#DC2626;text-transform:uppercase;letter-spacing:.5px;}
+.itsm-table tbody tr{border-bottom:1px solid #FEF2F2;transition:background .2s;}
+.itsm-table tbody tr:hover{background:#FFF5F5;}
+.itsm-table td{padding:13px 15px;font-size:13px;vertical-align:middle;}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
+.badge-prio-CRITIQUE{background:linear-gradient(135deg,#FF6B6B,#FF4A5E);color:#fff;}
+.badge-prio-HAUTE{background:linear-gradient(135deg,#FFA500,#FFD700);color:#FF4500;}
+.badge-prio-MOYENNE{background:#87CEEB;color:#1565C0;}
+.badge-prio-BASSE{background:#90EE90;color:#228B22;}
+.badge-status-ESCALADE{background:#FFEBE6;color:#DE350B;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;border:none;cursor:pointer;transition:all .2s;text-decoration:none;text-transform:uppercase;}
+.btn-danger{background:#EF4444;color:#fff;border:1px solid #DC2626;}
+.btn-danger:hover{transform:scale(1.05);}
+.btn-sm{padding:5px 10px;font-size:11px;}
+.sla-bar-track{background:#FEE2E2;height:8px;border-radius:4px;overflow:hidden;display:inline-block;}
+.sla-bar-fill.danger{background:linear-gradient(90deg,#EF4444,#F87171);height:100%;border-radius:4px;}
+.text-muted{color:#94A3B8;} .text-sm{font-size:12px;}
+.empty-state{text-align:center;padding:40px 20px;}
+.empty-icon{font-size:48px;margin-bottom:12px;}
+.empty-title{font-size:14px;font-weight:700;color:#10B981;}
+</style>
+<ui:define name="breadcrumb">
+    <a href="#{request.contextPath}/technicien/dashboard.xhtml" style="color:var(--text-muted);text-decoration:none;">Dashboard</a>
+    &#160;/&#160; <strong>Tickets escaladés</strong>
+</ui:define>
+<ui:define name="content">
+    <div class="page-header">
+        <div class="page-title">Tickets escaladés</div>
+        <div class="page-subtitle">Incidents nécessitant une intervention urgente ou une escalade hiérarchique</div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Liste des escalades</span>
+            <span class="badge" style="background:#FFEBE6;color:#DE350B;font-size:13px;padding:6px 14px;">
+                <h:outputText value="#{technicienBean.ticketsEscalades.size()}"/> escalade(s)
+            </span>
+        </div>
+        <table class="itsm-table">
+            <thead><tr><th>#</th><th>Titre</th><th>Priorité</th><th>Déclarant</th><th>SLA</th><th>Échéance SLA</th><th>Date escalade</th><th>Action</th></tr></thead>
+            <tbody>
+            <ui:repeat value="#{technicienBean.ticketsEscalades}" var="t">
+                <tr>
+                    <td><span class="text-muted text-sm">#<h:outputText value="#{t.id}"/></span></td>
+                    <td><a href="#{request.contextPath}/technicien/ticket-detail.xhtml?id=#{t.id}" style="color:#DC2626;text-decoration:none;font-weight:700;"><h:outputText value="#{t.titre}"/></a></td>
+                    <td><span class="badge badge-prio-#{t.priorite}"><h:outputText value="#{t.priorite}"/></span></td>
+                    <td><h:outputText value="#{t.declarant.prenom}"/> <h:outputText value="#{t.declarant.nom}"/></td>
+                    <td>
+                        <div class="sla-bar-track" style="width:80px;"><div class="sla-bar-fill danger" style="width:#{t.slaPercent}%;"></div></div>
+                        <span style="color:#EF4444;font-size:12px;font-weight:700;"> <h:outputText value="#{t.slaPercent}"/>%</span>
+                    </td>
+                    <td><span class="text-sm text-muted"><h:outputText value="#{t.dateLimiteSla}"><f:convertDateTime pattern="dd/MM/yyyy HH:mm"/></h:outputText></span></td>
+                    <td><span class="text-muted text-sm"><h:outputText value="#{t.dateCreation}"><f:convertDateTime pattern="dd/MM/yyyy"/></h:outputText></span></td>
+                    <td><a href="#{request.contextPath}/technicien/ticket-detail.xhtml?id=#{t.id}" class="btn btn-danger btn-sm">Traiter</a></td>
+                </tr>
+            </ui:repeat>
+            <c:if test="#{empty technicienBean.ticketsEscalades}">
+                <tr><td colspan="8"><div class="empty-state"><div class="empty-icon"></div><div class="empty-title">Aucun ticket escaladé</div></div></td></tr>
+            </c:if>
+            </tbody>
+        </table>
+    </div>
+</ui:define>
+</ui:composition>
+</html>

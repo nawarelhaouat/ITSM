@@ -1,0 +1,85 @@
+<ui:composition template="/WEB-INF/templates/layoutDeclarant.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <div class="page-title">Créer un ticket</div>
+                <div class="page-subtitle">Signaler un nouveau problème</div>
+            </div>
+        </div>
+
+        <!-- FORM CARD -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Nouveau ticket</span>
+            </div>
+
+            <div class="card-body">
+
+                <h:form>
+
+                    <!-- TITRE -->
+                    <div class="form-group">
+                        <label class="form-label">Titre <span class="required">*</span></label>
+                        <h:inputText value="#{ticketBean.titre}"
+                                     styleClass="form-control"
+                                     required="true"
+                                     requiredMessage="Le titre est obligatoire"/>
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <h:inputTextarea value="#{ticketBean.description}"
+                                         styleClass="form-control"
+                                         rows="4"/>
+                    </div>
+
+                    <!-- PRIORITE + CATEGORIE -->
+                    <div class="form-row">
+
+                        <div class="form-group">
+                            <label class="form-label">Priorité</label>
+                            <h:selectOneMenu value="#{ticketBean.priorite}" styleClass="form-control">
+                                <f:selectItem itemValue="BASSE" itemLabel="Basse"/>
+                                <f:selectItem itemValue="MOYENNE" itemLabel="Moyenne"/>
+                                <f:selectItem itemValue="HAUTE" itemLabel="Haute"/>
+                                <f:selectItem itemValue="CRITIQUE" itemLabel="Critique"/>
+                            </h:selectOneMenu>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Catégorie</label>
+                            <h:inputText value="#{ticketBean.categorie}"
+                                         styleClass="form-control"/>
+                        </div>
+
+                    </div>
+
+                    <!-- BOUTONS -->
+                    <div class="d-flex gap-12 mt-24">
+
+                        <h:commandButton value="Créer le ticket"
+                                         action="#{ticketBean.createTicket}"
+                                         styleClass="btn btn-primary"/>
+
+                        <h:link outcome="/user/dashboard"
+                                styleClass="btn btn-secondary">
+                            Annuler
+                        </h:link>
+
+                    </div>
+
+                </h:form>
+
+            </div>
+        </div>
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition template="/WEB-INF/templates/layout.xhtml">
+<ui:define name="title">Audit Log - Admin - ITSM</ui:define>
+<style>
+.pg-title{font-size:22px;font-weight:700;color:#1E293B;margin:0 0 4px;}
+.pg-sub{font-size:13px;color:#64748B;margin-bottom:24px;}
+.card{background:#fff;border-radius:10px;border:1px solid #E2E8F0;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:20px;}
+.card-header{padding:14px 18px;border-bottom:1px solid #F1F5F9;display:flex;justify-content:space-between;align-items:center;}
+.card-title{font-size:14px;font-weight:600;color:#1E293B;}
+.itsm-table{width:100%;border-collapse:collapse;}
+.itsm-table th{background:#F8FAFC;color:#64748B;font-size:11.5px;font-weight:600;text-transform:uppercase;padding:10px 14px;border-bottom:1px solid #E2E8F0;text-align:left;}
+.itsm-table td{padding:10px 14px;font-size:13px;border-bottom:1px solid #F1F5F9;color:#334155;vertical-align:middle;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;}
+.badge-status-OUVERT{background:#DEEBFF;color:#0052CC;} .badge-status-ASSIGNE{background:#EAE6FF;color:#6554C0;}
+.badge-status-EN_COURS{background:#FFF0E6;color:#FF8B00;} .badge-status-ESCALADE{background:#FFEBE6;color:#DE350B;}
+.badge-status-RESOLU{background:#E3FCEF;color:#006644;} .badge-status-CLOTURE{background:#F4F5F7;color:#6B778C;}
+.timeline{display:flex;flex-direction:column;}
+.tl-item{display:flex;gap:14px;padding:10px 0;position:relative;}
+.tl-item:not(:last-child)::after{content:'';position:absolute;left:11px;top:32px;bottom:0;width:1px;background:#E2E8F0;}
+.tl-dot{width:24px;height:24px;border-radius:50%;background:#EEF2FF;border:2px solid #C7D2FE;flex-shrink:0;display:flex;align-items:center;justify-content:center;z-index:1;}
+.tl-dot svg{width:11px;height:11px;stroke:#6366F1;}
+.tl-body{flex:1;min-width:0;}
+.tl-title{font-size:13px;color:#1E293B;font-weight:500;}
+.tl-time{font-size:11.5px;color:#94A3B8;margin-top:2px;}
+.tl-ticket{font-size:12px;color:#6366F1;text-decoration:none;}
+.filters-bar{display:flex;gap:10px;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid #F1F5F9;background:#FAFBFC;}
+.filter-select{padding:7px 10px;font-size:13px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;color:#334155;cursor:pointer;outline:none;}
+.empty-state{text-align:center;padding:50px;color:#94A3B8;}
+</style>
+<ui:define name="breadcrumb">
+    <a href="#{request.contextPath}/admin/dashboard.xhtml" style="color:#64748B;text-decoration:none;">Dashboard</a>
+    &#160;/&#160; <strong>Audit Log</strong>
+</ui:define>
+<ui:define name="content">
+    <div class="pg-title">Journal d'audit</div>
+    <div class="pg-sub">Historique complet des changements de statut des tickets</div>
+
+    <!-- Statistiques rapides -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px;">
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+            <div style="font-size:26px;font-weight:700;color:#1E293B;"><h:outputText value="#{adminDashboardBean.totalTickets}"/></div>
+            <div style="font-size:12px;color:#64748B;margin-top:4px;">Tickets total</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+            <div style="font-size:26px;font-weight:700;color:#F59E0B;"><h:outputText value="#{adminDashboardBean.ticketsEnCours}"/></div>
+            <div style="font-size:12px;color:#64748B;margin-top:4px;">En cours</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+            <div style="font-size:26px;font-weight:700;color:#EF4444;"><h:outputText value="#{adminDashboardBean.ticketsEscalade}"/></div>
+            <div style="font-size:12px;color:#64748B;margin-top:4px;">Escalades</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+            <div style="font-size:26px;font-weight:700;color:#10B981;"><h:outputText value="#{adminDashboardBean.ticketsResolu}"/></div>
+            <div style="font-size:12px;color:#64748B;margin-top:4px;">Resolus</div>
+        </div>
+    </div>
+
+    <!-- Historique des transitions de statut -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Historique des changements de statut</span>
+            <span style="font-size:12px;color:#64748B;">Tickets recents</span>
+        </div>
+        <div style="padding:16px 18px;">
+            <div class="timeline">
+            <ui:repeat value="#{adminDashboardBean.recentTickets}" var="t">
+                <div class="tl-item">
+                    <div class="tl-dot">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="4"/>
+                        </svg>
+                    </div>
+                    <div class="tl-body">
+                        <div class="tl-title">
+                            <a href="#{request.contextPath}/admin/tickets.xhtml" class="tl-ticket">#<h:outputText value="#{t.id}"/></a>
+                            &#160;
+                            <h:outputText value="#{t.titre}"/>
+                            &#160;&#8594;&#160;
+                            <span class="badge badge-status-#{t.statut}"><h:outputText value="#{t.statut}"/></span>
+                        </div>
+                        <div class="tl-time">
+                            Declare par <strong><h:outputText value="#{t.declarant.prenom}"/> <h:outputText value="#{t.declarant.nom}"/></strong>
+                            &#160;·&#160;
+                            <h:outputText value="#{t.dateCreation}"><f:convertDateTime pattern="dd/MM/yyyy HH:mm"/></h:outputText>
+                            <h:panelGroup rendered="#{t.technicien != null}">
+                                &#160;·&#160; Technicien : <h:outputText value="#{t.technicien.prenom}"/> <h:outputText value="#{t.technicien.nom}"/>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+            </ui:repeat>
+            <c:if test="#{empty adminDashboardBean.recentTickets}">
+                <div class="empty-state">Aucun ticket dans l'historique</div>
+            </c:if>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau de tous les tickets avec statut -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Tous les tickets — etat actuel</span>
+            <span style="font-size:12px;background:#F1F5F9;color:#64748B;padding:3px 10px;border-radius:20px;">
+                <h:outputText value="#{adminDashboardBean.totalTickets}"/> tickets
+            </span>
+        </div>
+        <table class="itsm-table">
+            <thead>
+                <tr><th>#</th><th>Titre</th><th>Statut</th><th>Priorite</th><th>Declarant</th><th>Technicien</th><th>Date creation</th></tr>
+            </thead>
+            <tbody>
+            <ui:repeat value="#{adminDashboardBean.recentTickets}" var="t">
+                <tr>
+                    <td style="color:#94A3B8;">#<h:outputText value="#{t.id}"/></td>
+                    <td><span style="font-weight:500;"><h:outputText value="#{t.titre}"/></span></td>
+                    <td><span class="badge badge-status-#{t.statut}"><h:outputText value="#{t.statut}"/></span></td>
+                    <td>
+                        <span class="badge" style="background:#F1F5F9;color:#475569;">
+                            <h:outputText value="#{t.priorite}"/>
+                        </span>
+                    </td>
+                    <td><h:outputText value="#{t.declarant.prenom}"/> <h:outputText value="#{t.declarant.nom}"/></td>
+                    <td>
+                        <h:panelGroup rendered="#{t.technicien != null}">
+                            <h:outputText value="#{t.technicien.prenom}"/> <h:outputText value="#{t.technicien.nom}"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{t.technicien == null}">
+                            <span style="color:#94A3B8;">—</span>
+                        </h:panelGroup>
+                    </td>
+                    <td style="color:#94A3B8;font-size:12px;">
+                        <h:outputText value="#{t.dateCreation}"><f:convertDateTime pattern="dd/MM/yyyy HH:mm"/></h:outputText>
+                    </td>
+                </tr>
+            </ui:repeat>
+            <c:if test="#{empty adminDashboardBean.recentTickets}">
+                <tr><td colspan="7" style="text-align:center;padding:30px;color:#94A3B8;">Aucun ticket</td></tr>
+            </c:if>
+            </tbody>
+        </table>
+    </div>
+</ui:define>
+</ui:composition>
+</html>

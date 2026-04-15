@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="title">Tous les tickets</ui:define>
+    <ui:define name="breadcrumb">
+        <a href="#{request.contextPath}/admin/dashboard.xhtml"
+           style="color:var(--text-muted);text-decoration:none;">Dashboard</a>
+        &#160;/&#160; <strong>Tickets</strong>
+    </ui:define>
+    <ui:define name="content">
+        <div class="page-header">
+            <div>
+                <div class="page-title">Liste des tickets</div>
+                <div class="page-subtitle">Consultez l’ensemble des demandes et leur état actuel</div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Tous les tickets</span>
+            </div>
+
+            <table class="itsm-table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Titre</th>
+                    <th>Déclarant</th>
+                    <th>Priorité</th>
+                    <th>Statut</th>
+                    <th>SLA</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <ui:repeat value="#{ticketBean.allTickets}" var="t">
+                    <tr>
+                        <td>#<h:outputText value="#{t.id}"/></td>
+
+                        <td>
+                            <a href="ticket-detail.xhtml?id=#{t.id}">
+                                <h:outputText value="#{t.titre}"/>
+                            </a>
+                        </td>
+
+                        <td>
+                            #{t.declarant.prenom} #{t.declarant.nom}
+                        </td>
+
+                        <td>
+                                <span class="badge badge-prio-#{t.priorite}">
+                                    #{t.priorite}
+                                </span>
+                        </td>
+
+                        <td>
+                                <span class="badge badge-status-#{t.statut}">
+                                    #{t.statut}
+                                </span>
+                        </td>
+
+                        <td>
+                            #{t.slaPercent}%
+                        </td>
+
+                        <td>
+                            <h:outputText value="#{t.dateCreation}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:outputText>
+                        </td>
+                    </tr>
+                </ui:repeat>
+                </tbody>
+            </table>
+
+        </div>
+
+    </ui:define>
+
+</ui:composition>
+</html>

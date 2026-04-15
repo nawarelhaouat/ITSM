@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition template="/WEB-INF/templates/layoutTechnicien.xhtml">
+    <ui:define name="title">Dashboard Technicien - ITSM</ui:define>
+    <style>
+        .page-header{background:#fff;padding:0 0 20px;margin-bottom:24px;border-bottom:1px solid #F1F5F9;}
+        .page-title{font-size:22px;font-weight:700;color:#1E293B;margin-bottom:4px;}
+        .page-subtitle{font-size:13px;color:#6B5B95;font-weight:500;}
+        .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:30px;}
+        .kpi-card{background:#fff;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #E2E8F0;}
+        .kpi-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1);}
+        .kpi-card.orange{}
+        .kpi-card.red{}
+        .kpi-card.green{}
+        .kpi-value{font-size:30px;font-weight:700;color:#1E293B;line-height:1.1;}
+        
+        
+        
+        .kpi-label{font-size:12px;color:#64748B;margin-top:6px;}
+          
+        .card{background:#fff;border-radius:15px;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #E2E8F0;overflow:hidden;margin-bottom:20px;}
+        .card-header{display:flex;justify-content:space-between;align-items:center;padding:20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;}
+        .card-title{font-size:14px;font-weight:600;color:#1E293B;}
+        .itsm-table{width:100%;border-collapse:collapse;}
+        .itsm-table thead tr{background:linear-gradient(135deg,#F5F3FF,#EEF2FF);border-bottom:2px solid #C7D2FE;}
+        .itsm-table th{padding:13px 15px;text-align:left;font-size:11px;font-weight:700;color:#4338CA;text-transform:uppercase;letter-spacing:.5px;}
+        .itsm-table tbody tr{border-bottom:1px solid #F5F3FF;transition:background .2s;}
+        .itsm-table tbody tr:hover{background:#F5F3FF;}
+        .itsm-table td{padding:13px 15px;font-size:13px;color:#333;vertical-align:middle;}
+        .badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
+        .badge-prio-CRITIQUE{background:linear-gradient(135deg,#FF6B6B,#FF4A5E);color:#fff;}
+        .badge-prio-HAUTE{background:linear-gradient(135deg,#FFA500,#FFD700);color:#FF4500;}
+        .badge-prio-MOYENNE{background:linear-gradient(135deg,#87CEEB,#64B5F6);color:#1565C0;}
+        .badge-prio-BASSE{background:linear-gradient(135deg,#90EE90,#98FB98);color:#228B22;}
+        .badge-status-OUVERT{background:#DEEBFF;color:#0052CC;} .badge-status-ASSIGNE{background:#EAE6FF;color:#6554C0;}
+        .badge-status-EN_COURS{background:#FFF0E6;color:#FF8B00;} .badge-status-ESCALADE{background:#FFEBE6;color:#DE350B;}
+        .badge-status-RESOLU{background:#E3FCEF;color:#006644;} .badge-status-CLOTURE{background:#F4F5F7;color:#6B778C;}
+        .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;border:none;cursor:pointer;transition:all .2s;text-decoration:none;text-transform:uppercase;letter-spacing:.5px;}
+        .btn-primary{background:#4F46E5;color:#fff;border:1px solid #4338CA;}
+        .btn-primary:hover{transform:scale(1.05);box-shadow:0 4px 12px rgba(79,70,229,.3);}
+        .btn-secondary{background:#fff;color:#475569;border:1px solid #E2E8F0;}
+        .btn-warning{background:#F59E0B;color:#fff;border:1px solid #D97706;}
+        .btn-sm{padding:5px 10px;font-size:11px;}
+        .empty-state{text-align:center;padding:40px 20px;}
+        .empty-icon{font-size:48px;margin-bottom:12px;}
+        .empty-title{font-size:14px;font-weight:700;color:#4338CA;}
+        .sla-bar-track{background:#EEF2FF;height:8px;border-radius:4px;overflow:hidden;display:inline-block;}
+        .sla-bar-fill{height:100%;border-radius:4px;}
+        .sla-bar-fill.ok{background:linear-gradient(90deg,#10B981,#34D399);}
+        .sla-bar-fill.warn{background:linear-gradient(90deg,#F59E0B,#FBBF24);}
+        .sla-bar-fill.danger{background:linear-gradient(90deg,#EF4444,#F87171);}
+        .text-muted{color:#94A3B8;} .text-sm{font-size:12px;}
+        .quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+        .quick-action-card{background:#fff;border-radius:12px;padding:20px;display:flex;align-items:center;gap:16px;text-decoration:none;border:2px solid #EEF2FF;transition:all .2s;box-shadow:0 2px 8px rgba(99,102,241,.08);}
+        .quick-action-card:hover{border-color:#C7D2FE;transform:translateY(-2px);box-shadow:0 6px 16px rgba(99,102,241,.15);}
+        .quick-action-icon{font-size:28px;} .quick-action-label{font-size:14px;font-weight:700;color:#4338CA;} .quick-action-desc{font-size:12px;color:#94A3B8;}
+    </style>
+    <ui:define name="breadcrumb"><strong>Tableau de bord</strong></ui:define>
+    <ui:define name="content">
+        <div class="page-header">
+            <div class="page-title">Bonjour, <h:outputText value="#{loginBean.user.prenom}"/> !</div>
+            <div class="page-subtitle">Voici un résumé de votre activité — <h:outputText value="#{technicienDashboardBean.lastUpdate}"/></div>
+        </div>
+        <div class="kpi-grid">
+            <div class="kpi-card"><div class="kpi-value"><h:outputText value="#{technicienDashboardBean.mesTicketsTotal}"/></div><div class="kpi-label">Mes tickets</div></div>
+            <div class="kpi-card orange"><div class="kpi-value"><h:outputText value="#{technicienDashboardBean.mesTicketsEnCours}"/></div><div class="kpi-label">En cours</div></div>
+            <div class="kpi-card red"><div class="kpi-value"><h:outputText value="#{technicienDashboardBean.mesTicketsEscalade}"/></div><div class="kpi-label">Escaladés</div></div>
+            <div class="kpi-card green"><div class="kpi-value"><h:outputText value="#{technicienDashboardBean.mesTicketsResolus}"/></div><div class="kpi-label">Résolus</div></div>
+        </div>
+        <div class="quick-actions">
+            <a href="#{request.contextPath}/technicien/mes-tickets.xhtml" class="quick-action-card">
+                <span class="quick-action-icon"></span>
+                <div><div class="quick-action-label">Mes tickets assignés</div><div class="quick-action-desc">Voir et traiter mes tickets</div></div>
+            </a>
+            <a href="#{request.contextPath}/technicien/escalades.xhtml" class="quick-action-card">
+                <span class="quick-action-icon"></span>
+                <div><div class="quick-action-label">Tickets escaladés</div><div class="quick-action-desc">Tickets nécessitant une attention urgente</div></div>
+            </a>
+            <a href="#{request.contextPath}/technicien/tous-tickets.xhtml" class="quick-action-card">
+                <span class="quick-action-icon"></span>
+                <div><div class="quick-action-label">Tous les tickets</div><div class="quick-action-desc">Consulter l'ensemble des tickets</div></div>
+            </a>
+            <a href="#{request.contextPath}/technicien/problemes.xhtml" class="quick-action-card">
+                <span class="quick-action-icon"></span>
+                <div><div class="quick-action-label">Problèmes</div><div class="quick-action-desc">Gérer les problèmes récurrents</div></div>
+            </a>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Mes tickets actifs</span>
+                <a href="#{request.contextPath}/technicien/mes-tickets.xhtml" class="btn btn-secondary btn-sm">Voir tout</a>
+            </div>
+            <table class="itsm-table">
+                <thead><tr><th>#</th><th>Titre</th><th>Priorité</th><th>Statut</th><th>SLA</th><th>Déclarant</th><th>Action</th></tr></thead>
+                <tbody>
+                <ui:repeat value="#{technicienDashboardBean.mesTicketsActifs}" var="t">
+                    <tr>
+                        <td><span class="text-muted text-sm">#<h:outputText value="#{t.id}"/></span></td>
+                        <td><a href="#{request.contextPath}/technicien/ticket-detail.xhtml?id=#{t.id}" style="color:#4338CA;text-decoration:none;font-weight:600;"><h:outputText value="#{t.titre}"/></a></td>
+                        <td><span class="badge badge-prio-#{t.priorite}"><h:outputText value="#{t.priorite}"/></span></td>
+                        <td><span class="badge badge-status-#{t.statut}"><h:outputText value="#{t.statut}"/></span></td>
+                        <td>
+                            <div class="sla-bar-track" style="width:80px;">
+                                <div class="sla-bar-fill #{t.slaPercent >= 80 ? 'danger' : (t.slaPercent >= 50 ? 'warn' : 'ok')}" style="width:#{t.slaPercent}%;"></div>
+                            </div>
+                            <span class="text-muted text-sm"> <h:outputText value="#{t.slaPercent}"/>%</span>
+                        </td>
+                        <td><h:outputText value="#{t.declarant.prenom}"/> <h:outputText value="#{t.declarant.nom}"/></td>
+                        <td><a href="#{request.contextPath}/technicien/ticket-detail.xhtml?id=#{t.id}" class="btn btn-primary btn-sm">Traiter</a></td>
+                    </tr>
+                </ui:repeat>
+                <c:if test="#{empty technicienDashboardBean.mesTicketsActifs}">
+                    <tr><td colspan="7"><div class="empty-state"><div class="empty-icon"></div><div class="empty-title">Aucun ticket actif</div></div></td></tr>
+                </c:if>
+                </tbody>
+            </table>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">SLA en danger (≥ 80%)</span>
+                <span class="badge" style="background:#FEE2E2;color:#DC2626;"><h:outputText value="#{technicienDashboardBean.ticketsSlaEnDanger.size()}"/> alerte(s)</span>
+            </div>
+            <table class="itsm-table">
+                <thead><tr><th>#</th><th>Titre</th><th>Priorité</th><th>SLA</th><th>Échéance</th><th>Action</th></tr></thead>
+                <tbody>
+                <ui:repeat value="#{technicienDashboardBean.ticketsSlaEnDanger}" var="t">
+                    <tr>
+                        <td><span class="text-muted text-sm">#<h:outputText value="#{t.id}"/></span></td>
+                        <td><a href="#{request.contextPath}/technicien/ticket-detail.xhtml?id=#{t.id}" style="color:#4338CA;text-decoration:none;font-weight:600;"><h:outputText value="#{t.titre}"/></a></td>
+                        <td><span class="badge badge-prio-#{t.priorite}"><h:outputText value="#{t.priorite}"/></span></td>
+                        <td>
+                            <div class="sla-bar-track" style="width:100px;"><div class="sla-bar-fill danger" style="width:#{t.slaPercent}%;"></div></div>
+                            <span class="text-sm" style="color:#EF4444;"> <h:outputText value="#{t.slaPercent}"/>%</span>
+                        </td>
+                        <td><span class="text-sm text-muted"><h:outputText value="#{t.dateLimiteSla}"><f:convertDateTime pattern="dd/MM/yyyy HH:mm"/></h:outputText></span></td>
+                        <td><a href="#{request.contextPath}/technicien/ticket-detail.xhtml?id=#{t.id}" class="btn btn-warning btn-sm">Urgence</a></td>
+                    </tr>
+                </ui:repeat>
+                <c:if test="#{empty technicienDashboardBean.ticketsSlaEnDanger}">
+                    <tr><td colspan="6"><div class="empty-state" style="padding:24px;"><div class="empty-title">Aucun SLA en danger</div></div></td></tr>
+                </c:if>
+                </tbody>
+            </table>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

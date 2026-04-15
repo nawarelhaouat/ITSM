@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+<ui:composition template="/WEB-INF/templates/layout.xhtml">
+
+    ```
+    <ui:define name="title">Gestion des Utilisateurs</ui:define>
+
+
+
+    <ui:define name="breadcrumb">
+        <a href="#{request.contextPath}/admin/dashboard.xhtml"
+           style="color:var(--text-muted);text-decoration:none;">Dashboard</a>
+        &#160;/&#160; <strong>Utilisateurs</strong>
+    </ui:define>
+
+
+    <ui:define name="content">
+
+        <div class="page-header">
+            <div>
+                <div class="page-title">Gestion des utilisateurs</div>
+                <div class="page-subtitle"><h:outputText value="#{userAdminBean.totalUsers}"/> utilisateur(s)</div>
+            </div>
+            <h:form>
+                <h:commandButton value="+ Nouvel utilisateur"
+                                 action="#{userAdminBean.openCreateDialog}"
+                                 styleClass="btn btn-primary"/>
+            </h:form>
+        </div>
+
+        <!-- Filtres -->
+        <div class="card" style="margin-bottom:20px;">
+            <h:form id="filterForm">
+                <div class="filters-bar">
+                    <h:inputText value="#{userAdminBean.searchTerm}"
+                                 styleClass="filter-search"
+                                 placeholder="Rechercher par nom, email..."/>
+                    <h:selectOneMenu value="#{userAdminBean.filterRole}" styleClass="filter-select">
+                        <f:selectItem itemValue="" itemLabel="Tous les rôles"/>
+                        <f:selectItem itemValue="UTILISATEUR" itemLabel="Utilisateur"/>
+                        <f:selectItem itemValue="TECHNICIEN"  itemLabel="Technicien"/>
+                        <f:selectItem itemValue="MANAGER"     itemLabel="Manager"/>
+                        <f:selectItem itemValue="ADMIN"       itemLabel="Admin"/>
+                    </h:selectOneMenu>
+                    <h:selectOneMenu value="#{userAdminBean.filterActif}" styleClass="filter-select">
+                        <f:selectItem itemValue=""     itemLabel="Tous"/>
+                        <f:selectItem itemValue="true" itemLabel="Actifs"/>
+                        <f:selectItem itemValue="false" itemLabel="Désactivés"/>
+                    </h:selectOneMenu>
+                    <h:commandButton value="Filtrer" action="#{userAdminBean.applyFilters}"
+                                     styleClass="btn btn-secondary"/>
+                </div>
+            </h:form>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+            <table class="itsm-table">
+                <thead>
+                <tr>
+                    <th>Utilisateur</th><th>Email</th><th>Rôle</th>
+                    <th>Département</th><th>Statut</th><th>Créé le</th><th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <ui:repeat value="#{userAdminBean.users}" var="u">
+                    <tr>
+                        <td>
+                            <div class="d-flex align-center gap-8">
+                                <div class="avatar" style="width:32px;height:32px;font-size:12px;">
+                                    <h:outputText value="#{u.initials}"/>
+                                </div>
+                                <span style="font-weight:500;">
+                                    <h:outputText value="#{u.prenom}"/> <h:outputText value="#{u.nom}"/>
+                                </span>
+                            </div>
+                        </td>
+                        <td><span class="text-muted"><h:outputText value="#{u.email}"/></span></td>
+                        <td><span class="badge badge-role-#{u.role}"><h:outputText value="#{u.role}"/></span></td>
+                        <td><h:outputText value="#{u.departement != null ? u.departement : '—'}"/></td>
+                        <td>
+                            <h:panelGroup rendered="#{u.actif}">
+                                <span class="badge badge-status-RESOLU">Actif</span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{!u.actif}">
+                                <span class="badge badge-status-CLOTURE">Inactif</span>
+                            </h:panelGroup>
+                        </td>
+                        <td>
+                            <span class="text-muted text-sm">
+                                <h:outputText value="#{u.dateCreation}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </span>
+                        </td>
+                        <td>
+                            <h:form>
+                                <div class="d-flex gap-8">
+                                    <h:commandButton value="✏ Modifier"
+                                                     action="#{userAdminBean.editUser(u)}"
+                                                     styleClass="btn btn-secondary btn-sm"/>
+                                    <h:commandButton value="#{u.actif ? '🚫 Désactiver' : 'Activer'}"
+                                                     action="#{userAdminBean.toggleActif(u)}"
+                                                     styleClass="btn #{u.actif ? 'btn-danger' : 'btn-success'} btn-sm"
+                                                     onclick="return confirm('Confirmer ?')"/>
+                                </div>
+                            </h:form>
+                        </td>
+                    </tr>
+                </ui:repeat>
+                <c:if test="#{empty userAdminBean.users}">
+                    <tr><td colspan="7">
+                        <div class="empty-state">
+                            <div class="empty-icon">👥</div>
+                            <div class="empty-title">Aucun utilisateur trouvé</div>
+                        </div>
+                    </td></tr>
+                </c:if>
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="pagination-bar">
+            <span class="pagination-info">
+                Page <h:outputText value="#{userAdminBean.currentPage}"/> /
+                <h:outputText value="#{userAdminBean.totalPages}"/>
+            </span>
+                <h:form>
+                    <div class="pagination-controls">
+                        <h:commandButton value="‹" styleClass="page-btn"
+                                         action="#{userAdminBean.prevPage}"
+                                         disabled="#{userAdminBean.currentPage le 1}"/>
+                        <h:commandButton value="›" styleClass="page-btn"
+                                         action="#{userAdminBean.nextPage}"
+                                         disabled="#{userAdminBean.currentPage ge userAdminBean.totalPages}"/>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+
+        <!-- Dialog Créer/Modifier -->
+        <h:panelGroup rendered="#{userAdminBean.showDialog}">
+            <div class="modal-overlay">
+                <div class="modal-box">
+                    <div class="modal-header">
+                    <span class="modal-title">
+                        <h:outputText value="#{userAdminBean.selectedUser.id == null ? 'Nouvel utilisateur' : 'Modifier utilisateur'}"/>
+                    </span>
+                        <h:form>
+                            <h:commandButton value="✕" styleClass="modal-close"
+                                             action="#{userAdminBean.closeDialog}"/>
+                        </h:form>
+                    </div>
+                    <h:form id="userForm">
+                        <div class="modal-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Prénom <span class="required">*</span></label>
+                                    <h:inputText value="#{userAdminBean.selectedUser.prenom}"
+                                                 styleClass="form-control" required="true"/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Nom <span class="required">*</span></label>
+                                    <h:inputText value="#{userAdminBean.selectedUser.nom}"
+                                                 styleClass="form-control" required="true"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email <span class="required">*</span></label>
+                                <h:inputText value="#{userAdminBean.selectedUser.email}"
+                                             styleClass="form-control" required="true"/>
+                            </div>
+                            <h:panelGroup rendered="#{userAdminBean.selectedUser.id == null}">
+                                <div class="form-group">
+                                    <label class="form-label">Mot de passe <span class="required">*</span></label>
+                                    <h:inputSecret value="#{userAdminBean.plainPassword}"
+                                                   styleClass="form-control"/>
+                                </div>
+                            </h:panelGroup>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Rôle <span class="required">*</span></label>
+                                    <h:selectOneMenu value="#{userAdminBean.selectedUser.role}"
+                                                     styleClass="form-control" required="true">
+                                        <f:selectItem itemValue=""            itemLabel="-- Choisir --"/>
+                                        <f:selectItem itemValue="UTILISATEUR" itemLabel="Utilisateur"/>
+                                        <f:selectItem itemValue="TECHNICIEN"  itemLabel="Technicien"/>
+                                        <f:selectItem itemValue="MANAGER"     itemLabel="Manager"/>
+                                        <f:selectItem itemValue="ADMIN"       itemLabel="Admin"/>
+                                    </h:selectOneMenu>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Département</label>
+                                    <h:inputText value="#{userAdminBean.selectedUser.departement}"
+                                                 styleClass="form-control" placeholder="ex: Informatique"/>
+                                </div>
+                            </div>
+                            <h:messages styleClass="alert alert-danger" layout="list"/>
+                        </div>
+                        <div class="modal-footer">
+                            <h:commandButton value="Annuler" action="#{userAdminBean.closeDialog}"
+                                             styleClass="btn btn-secondary"/>
+                            <h:commandButton value="#{userAdminBean.selectedUser.id == null ? 'Créer' : 'Enregistrer'}"
+                                             action="#{userAdminBean.saveUser}"
+                                             styleClass="btn btn-primary"/>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </h:panelGroup>
+
+    </ui:define>
+    ```
+
+</ui:composition>
+
+</html>

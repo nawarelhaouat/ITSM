@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<ui:composition template="/WEB-INF/templates/layoutTechnicien.xhtml">
+<ui:define name="title">Mon profil - ITSM</ui:define>
+<style>
+.page-header{background:#fff;padding:0 0 20px;margin-bottom:24px;border-bottom:1px solid #F1F5F9;}
+.page-title{font-size:22px;font-weight:700;color:#1E293B;margin-bottom:4px;}
+.page-subtitle{font-size:13px;color:#6B5B95;}
+.profile-layout{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start;}
+.card{background:#fff;border-radius:15px;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #E2E8F0;overflow:hidden;margin-bottom:20px;}
+.card-header{padding:20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;}
+.card-title{font-size:14px;font-weight:600;color:#1E293B;}
+.card-body{padding:24px;}
+.avatar-large{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#4F46E5,#7C3AED);color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.profile-name{font-size:20px;font-weight:700;color:#1E293B;text-align:center;}
+.profile-role{text-align:center;margin-top:6px;}
+.profile-email{font-size:13px;color:#64748B;text-align:center;margin-top:8px;}
+.form-group{margin-bottom:18px;}
+.form-label{display:block;font-size:12px;font-weight:700;color:#6366F1;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;}
+.form-control{width:100%;padding:10px 14px;font-size:14px;border:1.5px solid #C7D2FE;border-radius:8px;background:#fff;color:#333;outline:none;transition:border .2s;}
+.form-control:focus{border-color:#6366F1;}
+.form-control:disabled{background:#F8FAFC;color:#94A3B8;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.badge{display:inline-block;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;text-transform:uppercase;}
+.badge-role-technicien{background:#EEF2FF;color:#4338CA;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;border:none;cursor:pointer;transition:all .2s;text-decoration:none;text-transform:uppercase;}
+.btn-primary{background:#4F46E5;color:#fff;border:1px solid #4338CA;}
+.btn-primary:hover{transform:scale(1.03);box-shadow:0 4px 12px rgba(79,70,229,.3);}
+.alert{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:16px;}
+.alert-success{background:#E3FCEF;color:#006644;border:1px solid #ABF5D1;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.stat-item{background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border-radius:10px;padding:14px;text-align:center;}
+.stat-value{font-size:24px;font-weight:800;color:#4338CA;}
+.stat-label{font-size:11px;color:#6366F1;font-weight:600;text-transform:uppercase;margin-top:4px;}
+@media(max-width:768px){.profile-layout{grid-template-columns:1fr;} .form-row{grid-template-columns:1fr;}}
+</style>
+<ui:define name="breadcrumb">
+    <a href="#{request.contextPath}/technicien/dashboard.xhtml" style="color:var(--text-muted);text-decoration:none;">Dashboard</a>
+    &#160;/&#160; <strong>Mon profil</strong>
+</ui:define>
+<ui:define name="content">
+    <div class="page-header">
+        <div class="page-title">Mon profil</div>
+        <div class="page-subtitle">Gérez vos informations personnelles et préférences</div>
+    </div>
+    <div class="profile-layout">
+        <!-- Carte gauche -->
+        <div>
+            <div class="card">
+                <div class="card-body" style="text-align:center;">
+                    <div class="avatar-large">
+                        <h:outputText value="#{loginBean.user.prenom != null ? loginBean.user.prenom.substring(0,1).toUpperCase() : 'T'}"/>
+                    </div>
+                    <div class="profile-name"><h:outputText value="#{loginBean.user.prenom}"/> <h:outputText value="#{loginBean.user.nom}"/></div>
+                    <div class="profile-role"><span class="badge badge-role-technicien">Technicien IT</span></div>
+                    <div class="profile-email"><h:outputText value="#{loginBean.user.email}"/></div>
+                    <div style="margin-top:12px;font-size:12px;color:#94A3B8;">Département : <h:outputText value="#{loginBean.user.departement != null ? loginBean.user.departement : 'Non défini'}"/></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-title">Mes statistiques</div></div>
+                <div class="card-body">
+                    <div class="stat-grid">
+                        <div class="stat-item"><div class="stat-value"><h:outputText value="#{technicienBean.mesTickets.size()}"/></div><div class="stat-label">Tickets</div></div>
+                        <div class="stat-item"><div class="stat-value"><h:outputText value="#{technicienBean.ticketsEscalades.size()}"/></div><div class="stat-label">Escalades</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Formulaire droite -->
+        <div class="card">
+            <div class="card-header"><div class="card-title">Modifier mes informations</div></div>
+            <div class="card-body">
+                <h:form>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Prénom</label>
+                            <h:inputText value="#{loginBean.user.prenom}" styleClass="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nom</label>
+                            <h:inputText value="#{loginBean.user.nom}" styleClass="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <h:inputText value="#{loginBean.user.email}" styleClass="form-control" disabled="true"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Département</label>
+                        <h:inputText value="#{loginBean.user.departement}" styleClass="form-control"/>
+                    </div>
+                    <h:commandButton value="Enregistrer les modifications" action="#{userBean.updateProfile}" styleClass="btn btn-primary"/>
+                </h:form>
+            </div>
+        </div>
+    </div>
+</ui:define>
+</ui:composition>
+</html>

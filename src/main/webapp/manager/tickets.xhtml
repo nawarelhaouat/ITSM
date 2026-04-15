@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition template="/WEB-INF/templates/layoutManager.xhtml">
+<ui:define name="title">Tickets - Manager - ITSM</ui:define>
+    <ui:define name="head-extra">
+<style>
+    /* TABLE COMPACTE + RESPONSIVE */
+    .itsm-ticket-table{
+        width:100%;
+        border-collapse:collapse;
+        table-layout: fixed;
+        font-size:11px;
+    }
+
+    /* HEADER */
+    .itsm-ticket-table thead th{
+        background:#F8FAFC;
+        color:#64748B;
+        font-weight:600;
+        font-size:11px;
+        letter-spacing:.4px;
+        text-transform:uppercase;
+        padding:6px 8px;
+        border-bottom:1px solid #E2E8F0;
+        text-align:left;
+        white-space:nowrap;
+    }
+
+    /* CELLS */
+    .itsm-ticket-table td{
+        padding:6px 8px;
+        font-size:11px;
+        vertical-align:middle;
+        color:#1E293B;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+    }
+
+    /* ROW HOVER */
+    .itsm-ticket-table tbody tr{
+        border-bottom:1px solid #F1F5F9;
+        transition:background .12s;
+    }
+
+    .itsm-ticket-table tbody tr:hover{
+        background:#F8FAFC;
+    }
+
+    /* 🔥 FIX LARGE COLUMNS */
+    .itsm-ticket-table td:nth-child(1){width:20px;}   /* ID */
+    .itsm-ticket-table td:nth-child(2){width:220px;}  /* Titre */
+    .itsm-ticket-table td:nth-child(3){width:100px;}  /* Declarant */
+    .itsm-ticket-table td:nth-child(4){width:30px;}  /* Priorité */
+    .itsm-ticket-table td:nth-child(5){width:30px;}  /* Statut */
+    .itsm-ticket-table td:nth-child(6){width:100px;}  /* Tech */
+    .itsm-ticket-table td:nth-child(7){width:40px;}  /* SLA */
+    .itsm-ticket-table td:nth-child(8){width:40px;}  /* Date */
+    .itsm-ticket-table td:nth-child(9){width:300px;}  /* Actions */
+
+    /* SLA BAR PLUS PETITE */
+    .sla-bar-track{
+        width:55px;
+        height:5px;
+    }
+
+    /* BADGES plus compacts */
+    .badge{
+        font-size:11px;
+    }
+
+    /* BUTTONS plus petits */
+    .btn{
+        padding:4px 8px;
+        font-size:11px;
+    }
+
+    /* FORM DANS TABLE (IMPORTANT) */
+    itsm-ticket-table select.form-control{
+        padding:4px 6px;
+        font-size:11.5px;
+        height:28px;
+    }
+</style>
+</ui:define>
+<ui:define name="breadcrumb">
+    <a href="#{request.contextPath}/manager/dashboard.xhtml" style="color:#64748B;text-decoration:none;">Dashboard</a>
+    &#160;/&#160; <strong>Tickets</strong>
+</ui:define>
+<ui:define name="content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div>
+            <h1 style="font-size:22px;font-weight:700;color:#1E293B;margin:0;">Gestion des tickets</h1>
+            <p style="font-size:13px;color:#64748B;margin:4px 0 0;">Assignation et suivi de tous les tickets</p>
+        </div>
+    </div>
+
+    <h:panelGroup rendered="#{managerTicketBean.successMessage != null}">
+        <div class="alert alert-success"><h:outputText value="#{managerTicketBean.successMessage}"/></div>
+    </h:panelGroup>
+    <h:panelGroup rendered="#{managerTicketBean.errorMessage != null}">
+        <div class="alert alert-danger"><h:outputText value="#{managerTicketBean.errorMessage}"/></div>
+    </h:panelGroup>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Tous les tickets</span>
+            <span style="font-size:12px;color:#64748B;background:#F1F5F9;padding:3px 10px;border-radius:20px;">
+                <h:outputText value="#{managerTicketBean.allTickets.size()}"/> tickets
+            </span>
+        </div>
+        <div class="filters-bar">
+            <select class="filter-select" onchange="filterByCol(this.value,4)">
+                <option value="">Tous les statuts</option>
+                <option value="OUVERT">Ouvert</option>
+                <option value="ASSIGNE">Assigne</option>
+                <option value="EN_COURS">En cours</option>
+                <option value="ESCALADE">Escalade</option>
+                <option value="RESOLU">Resolu</option>
+            </select>
+            <select class="filter-select" onchange="filterByCol(this.value,3)">
+                <option value="">Toutes priorites</option>
+                <option value="CRITIQUE">Critique</option>
+                <option value="HAUTE">Haute</option>
+                <option value="MOYENNE">Moyenne</option>
+                <option value="BASSE">Basse</option>
+            </select>
+        </div>
+        <table class="itsm-ticket-table" id="tickTable">
+            <thead>
+                <tr><th>#</th><th>Titre</th><th>Declarant</th><th>Priorite</th><th>Statut</th><th>Technicien</th><th>SLA</th><th>Date</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+            <ui:repeat value="#{managerTicketBean.allTickets}" var="t">
+                <tr>
+                    <td><span class="text-muted">#<h:outputText value="#{t.id}"/></span></td>
+                    <td>
+                        <a href="#{request.contextPath}/manager/ticket-detail.xhtml?id=#{t.id}"
+                           style="color:#4F46E5;text-decoration:none;font-weight:500;">
+                            <h:outputText value="#{t.titre}"/>
+                        </a>
+                    </td>
+                    <td style="color:#475569;"><h:outputText value="#{t.declarant.prenom }"/> <h:outputText value="#{t.declarant.nom}"/></td>
+                    <td><span class="badge"><h:outputText value="#{t.priorite}"/></span></td>
+                    <td><span class="badge"><h:outputText value="#{t.statut}"/></span></td>
+                    <td>
+                        <h:panelGroup rendered="#{t.technicien != null}">
+                            <span style="font-size:13px;color:#334155;">
+                                <h:outputText value="#{t.technicien.prenom }"/> <h:outputText value="#{t.technicien.nom}"/>
+                            </span>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{t.technicien == null}">
+                            <span class="text-muted">Non assigne</span>
+                        </h:panelGroup>
+                    </td>
+                    <td>
+                        <div class="sla-bar-wrap">
+                            <div class="sla-bar-track">
+                                <div class="sla-bar-fill #{t.slaPercent >= 80 ? 'sla-danger' : (t.slaPercent >= 50 ? 'sla-warn' : 'sla-ok')}"
+                                     style="width:#{t.slaPercent}%;"></div>
+                            </div>
+                            <span class="text-muted"><h:outputText value="#{t.slaPercent}"/>%</span>
+                        </div>
+                    </td>
+                    <td><span class="text-muted"><h:outputText value="#{t.dateCreation}"><f:convertDateTime pattern="dd/MM/yy"/></h:outputText></span></td>
+                    <td style="display:flex;gap:6px;flex-wrap:wrap;">
+                        <!-- Bouton Assigner via form JSF inline -->
+                        <h:form>
+                            <h:selectOneMenu value="#{managerTicketBean.selectedTechnicienId}"
+                                             styleClass="form-control">
+                                <f:selectItem itemValue="" itemLabel="Choisir..."/>
+                                <ui:repeat value="#{managerTicketBean.techniciens}" var="tech">
+                                    <f:selectItem itemValue="#{tech.id}" itemLabel="#{tech.prenom} #{tech.nom}"/>
+                                </ui:repeat>
+                            </h:selectOneMenu>
+
+                            <h:commandButton value="Assigner"
+                                             action="#{managerTicketBean.assignerTicketFromRow(t.id)}"
+                                             styleClass="btn btn-primary btn-sm"/>
+                        </h:form>
+                        <a href="#{request.contextPath}/manager/ticket-detail.xhtml?id=#{t.id}" class="btn btn-sm">Detail</a>
+                    </td>
+                </tr>
+            </ui:repeat>
+            <c:if test="#{empty managerTicketBean.allTickets}">
+                <tr><td colspan="9"><div class="empty-state">Aucun ticket trouve</div></td></tr>
+            </c:if>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        function filterByCol(val, colIdx) {
+            var rows = document.querySelectorAll('#tickTable tbody tr');
+            rows.forEach(function(row) {
+                if (!val) { row.style.display = ''; return; }
+                var cell = row.cells[colIdx];
+                var text = cell ? cell.textContent.trim().toUpperCase() : '';
+                row.style.display = text.includes(val.toUpperCase()) ? '' : 'none';
+            });
+        }
+    </script>
+</ui:define>
+</ui:composition>
+</html>

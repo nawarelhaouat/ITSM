@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>ITSM - <ui:insert name="title">Manager</ui:insert></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <h:outputStylesheet name="css/itsm-theme.css"/>
+    <ui:insert name="head-extra"/>
+    <style>
+        .topbar-user{display:flex;align-items:center;gap:10px;}
+        .topbar-user-avatar{width:32px;height:32px;border-radius:50%;background:#7C3AED;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .topbar-user-name{font-size:13px;font-weight:600;color:#1E293B;}
+        .topbar-user-role{font-size:11px;color:#64748B;}
+        .notif-btn{position:relative;padding:6px;border:1px solid #E2E8F0;border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+        .notif-btn:hover{background:#F8FAFC;}
+        .notif-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;background:#EF4444;border-radius:50%;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff;}
+        .notif-popup{position:absolute;top:42px;right:0;width:300px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:200;display:none;}
+        .notif-popup.open{display:block;}
+        .notif-popup-header{padding:14px 16px;border-bottom:1px solid #F1F5F9;font-size:13px;font-weight:700;color:#1E293B;}
+        .notif-popup-item{padding:12px 16px;border-bottom:1px solid #F8FAFC;font-size:13px;color:#475569;}
+        .notif-popup-empty{padding:24px;text-align:center;color:#94A3B8;font-size:13px;}
+        .nav-icon svg{width:16px;height:16px;flex-shrink:0;}
+    </style>
+</h:head>
+<h:body styleClass="itsm-body">
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-logo">
+            <h:graphicImage name="logo.png" library="images" styleClass="logo-img"/>
+        </div>
+        <ul class="nav-menu">
+            <li>
+                <a href="#{request.contextPath}/manager/dashboard.xhtml">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>
+                    <span class="nav-label">Tableau de bord</span>
+                </a>
+            </li>
+            <li><span class="nav-section">GESTION</span></li>
+            <li>
+                <a href="#{request.contextPath}/manager/tickets.xhtml">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5v2M15 11v2M15 17v2M5 5h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4V7a2 2 0 0 1 2-2z"/></svg></span>
+                    <span class="nav-label">Tickets</span>
+                </a>
+            </li>
+            <li>
+                <a href="#{request.contextPath}/manager/escalades.xhtml">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg></span>
+                    <span class="nav-label">Escalades</span>
+                </a>
+            </li>
+            <li>
+                <a href="#{request.contextPath}/manager/problemes.xhtml">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+                    <span class="nav-label">Problemes</span>
+                </a>
+            </li>
+            <li>
+                <a href="#{request.contextPath}/manager/changements.xhtml">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.99"/></svg></span>
+                    <span class="nav-label">Changements</span>
+                </a>
+            </li>
+            <li><span class="nav-section">RAPPORTS</span></li>
+            <li>
+                <a href="#{request.contextPath}/manager/rapports.xhtml">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+                    <span class="nav-label">Rapports</span>
+                </a>
+            </li>
+            <li><span class="nav-section">COMPTE</span></li>
+            <li>
+                <a href="#{request.contextPath}/manager/profil.xhtml">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+                    <span class="nav-label">Mon profil</span>
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <h:form>
+                <h:commandLink action="#{sessionBean.logout}" styleClass="logout-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    <span>Deconnexion</span>
+                </h:commandLink>
+            </h:form>
+        </div>
+    </nav>
+    <div class="main-wrapper">
+        <header class="topbar">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="topbar-breadcrumb"><ui:insert name="breadcrumb">Accueil</ui:insert></div>
+            <div class="topbar-actions">
+                <div style="position:relative;">
+                    <button class="notif-btn" onclick="toggleNotif()" id="notifBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <h:panelGroup rendered="#{notifBean.unreadCount gt 0}">
+                            <span class="notif-badge"><h:outputText value="#{notifBean.unreadCount}"/></span>
+                        </h:panelGroup>
+                    </button>
+                    <div class="notif-popup" id="notifPopup">
+                        <div class="notif-popup-header">Notifications (<h:outputText value="#{notifBean.unreadCount}"/>)</div>
+                        <h:panelGroup rendered="#{notifBean.unreadCount gt 0}">
+                            <div class="notif-popup-item">
+                                <strong><h:outputText value="#{notifBean.unreadCount}"/></strong> ticket(s) escalade(s) en attente de traitement.
+                            </div>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{notifBean.unreadCount == 0}">
+                            <div class="notif-popup-empty">Aucune notification</div>
+                        </h:panelGroup>
+                    </div>
+                </div>
+                <div class="topbar-user">
+                    <div class="topbar-user-avatar">
+                        <h:outputText value="#{loginBean.user.prenom != null ? loginBean.user.prenom.substring(0,1).toUpperCase() : 'M'}"/>
+                    </div>
+                    <div>
+                        <div class="topbar-user-name"><h:outputText value="#{loginBean.user.prenom }"/> <h:outputText value="#{loginBean.user.nom}"/></div>
+                        <div class="topbar-user-role">Manager</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="page-content"><ui:insert name="content"/></main>
+    </div>
+    <script>
+        function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');document.querySelector('.main-wrapper').classList.toggle('expanded');}
+        function toggleNotif(){document.getElementById('notifPopup').classList.toggle('open');}
+        document.addEventListener('click',function(e){var p=document.getElementById('notifPopup');var b=document.getElementById('notifBtn');if(p &amp;&amp; b &amp;&amp; !b.contains(e.target) &amp;&amp; !p.contains(e.target)){p.classList.remove('open');}});
+        document.addEventListener('DOMContentLoaded',function(){var path=window.location.pathname;document.querySelectorAll('.nav-menu li a').forEach(function(l){if(l.href &amp;&amp; path.endsWith(l.getAttribute('href').split('/').pop())){l.closest('li').classList.add('active');}});});
+    </script>
+</h:body>
+</html>

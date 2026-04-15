@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             version="3.0">
+
+    <persistence-unit name="itsmPU" transaction-type="JTA">
+
+        <!-- connexion WildFly -->
+        <jta-data-source>java:/jdbc/itsmDS</jta-data-source>
+
+        <!-- Mapping des entités JPA -->
+        <class>org.jakartaee.itsm.MODEL.User</class>
+        <class>org.jakartaee.itsm.MODEL.Ticket</class>
+        <class>org.jakartaee.itsm.MODEL.SlaConfig</class>
+        <class>org.jakartaee.itsm.MODEL.Metrics</class>
+        <class>org.jakartaee.itsm.MODEL.Commentaire</class>
+        <class>org.jakartaee.itsm.MODEL.HistoriqueStatut</class>
+        <class>org.jakartaee.itsm.MODEL.Probleme</class>
+        <class>org.jakartaee.itsm.MODEL.ChangeRequest</class>
+
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+
+        <properties>
+            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+        </properties>
+
+    </persistence-unit>
+</persistence>

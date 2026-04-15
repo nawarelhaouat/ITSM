@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<ui:composition template="/WEB-INF/templates/layout.xhtml">
+<ui:define name="title">Rapports - Admin - ITSM</ui:define>
+<style>
+.pg-title{font-size:22px;font-weight:700;color:#1E293B;margin:0 0 4px;}
+.pg-sub{font-size:13px;color:#64748B;margin-bottom:24px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:28px;}
+.kpi-card{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.kpi-val{font-size:32px;font-weight:700;color:#1E293B;line-height:1.1;}
+.kpi-lbl{font-size:12px;color:#64748B;margin-top:6px;font-weight:500;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+.card{background:#fff;border-radius:10px;border:1px solid #E2E8F0;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:20px;}
+.card-header{padding:14px 18px;border-bottom:1px solid #F1F5F9;display:flex;justify-content:space-between;align-items:center;}
+.card-title{font-size:14px;font-weight:600;color:#1E293B;}
+.card-body{padding:18px;}
+.bar-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #F8FAFC;}
+.bar-row:last-child{border:none;}
+.bar-label{font-size:13px;color:#334155;width:100px;flex-shrink:0;}
+.bar-track{flex:1;height:8px;background:#F1F5F9;border-radius:4px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;}
+.bar-fill.indigo{background:#6366F1;} .bar-fill.orange{background:#F59E0B;}
+.bar-fill.red{background:#EF4444;} .bar-fill.green{background:#10B981;}
+.bar-val{font-size:13px;font-weight:600;color:#1E293B;min-width:32px;text-align:right;}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F8FAFC;}
+.stat-row:last-child{border:none;}
+.stat-name{font-size:13px;color:#334155;}
+.itsm-table{width:100%;border-collapse:collapse;}
+.itsm-table th{background:#F8FAFC;color:#64748B;font-size:11.5px;font-weight:600;text-transform:uppercase;padding:10px 14px;border-bottom:1px solid #E2E8F0;text-align:left;}
+.itsm-table td{padding:10px 14px;font-size:13px;border-bottom:1px solid #F1F5F9;color:#334155;vertical-align:middle;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;}
+.bg-green{background:#ECFDF5;color:#065F46;} .bg-warn{background:#FFFBEB;color:#D97706;} .bg-red{background:#FEF2F2;color:#DC2626;}
+.badge-prio-CRITIQUE{background:#FFEBE6;color:#DE350B;} .badge-prio-HAUTE{background:#FFF0E6;color:#FF8B00;}
+.badge-prio-MOYENNE{background:#FFFAE6;color:#FF991F;} .badge-prio-BASSE{background:#E3FCEF;color:#006644;}
+.sla-bar{width:100%;height:6px;background:#E2E8F0;border-radius:3px;overflow:hidden;margin-top:4px;}
+.sla-fill{height:100%;border-radius:3px;}
+</style>
+<ui:define name="breadcrumb">
+    <a href="#{request.contextPath}/admin/dashboard.xhtml" style="color:#64748B;text-decoration:none;">Dashboard</a>
+    &#160;/&#160; <strong>Rapports</strong>
+</ui:define>
+<ui:define name="content">
+    <div class="pg-title">Rapports et statistiques</div>
+    <div class="pg-sub">Vue globale de l'activite du systeme</div>
+
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-val"><h:outputText value="#{adminDashboardBean.totalTickets}"/></div>
+            <div class="kpi-lbl">Total tickets</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-val"><h:outputText value="#{adminDashboardBean.ticketsResolu}"/></div>
+            <div class="kpi-lbl">Resolus</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-val"><h:outputText value="#{adminDashboardBean.ticketsEscalade}"/></div>
+            <div class="kpi-lbl">Escalades actifs</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-val"><h:outputText value="#{adminDashboardBean.totalUtilisateurs}"/></div>
+            <div class="kpi-lbl">Utilisateurs actifs</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-val"><h:outputText value="#{adminDashboardBean.tauxSlaGlobalFormatted}"/>%</div>
+            <div class="kpi-lbl">Conformite SLA</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-val"><h:outputText value="#{adminDashboardBean.healthScore}"/>/100</div>
+            <div class="kpi-lbl">Score sante</div>
+        </div>
+    </div>
+
+    <div class="grid2">
+        <!-- Repartition par statut -->
+        <div class="card">
+            <div class="card-header"><span class="card-title">Tickets par statut</span></div>
+            <div class="card-body">
+                <div class="bar-row">
+                    <span class="bar-label">Ouverts</span>
+                    <div class="bar-track">
+                        <div class="bar-fill indigo"
+                             style="width:#{adminDashboardBean.totalTickets > 0 ? (adminDashboardBean.ticketsOuvert * 100 / adminDashboardBean.totalTickets) : 0}%;"></div>
+                    </div>
+                    <span class="bar-val"><h:outputText value="#{adminDashboardBean.ticketsOuvert}"/></span>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label">En cours</span>
+                    <div class="bar-track">
+                        <div class="bar-fill orange"
+                             style="width:#{adminDashboardBean.totalTickets > 0 ? (adminDashboardBean.ticketsEnCours * 100 / adminDashboardBean.totalTickets) : 0}%;"></div>
+                    </div>
+                    <span class="bar-val"><h:outputText value="#{adminDashboardBean.ticketsEnCours}"/></span>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label">Escalades</span>
+                    <div class="bar-track">
+                        <div class="bar-fill red"
+                             style="width:#{adminDashboardBean.totalTickets > 0 ? (adminDashboardBean.ticketsEscalade * 100 / adminDashboardBean.totalTickets) : 0}%;"></div>
+                    </div>
+                    <span class="bar-val"><h:outputText value="#{adminDashboardBean.ticketsEscalade}"/></span>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label">Resolus</span>
+                    <div class="bar-track">
+                        <div class="bar-fill green"
+                             style="width:#{adminDashboardBean.totalTickets > 0 ? (adminDashboardBean.ticketsResolu * 100 / adminDashboardBean.totalTickets) : 0}%;"></div>
+                    </div>
+                    <span class="bar-val"><h:outputText value="#{adminDashboardBean.ticketsResolu}"/></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLA global -->
+        <div class="card">
+            <div class="card-header"><span class="card-title">Performance SLA</span></div>
+            <div class="card-body">
+                <div class="stat-row">
+                    <span class="stat-name">Conformite globale</span>
+                    <strong style="font-size:18px;color:#6366F1;">
+                        <h:outputText value="#{adminDashboardBean.tauxSlaGlobalFormatted}"/>%
+                    </strong>
+                </div>
+                <div style="margin:12px 0;">
+                    <div class="sla-bar">
+                        <div class="sla-fill" style="width:#{adminDashboardBean.tauxSlaGlobal}%;background:#6366F1;"></div>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">Tickets en danger SLA</span>
+                    <strong style="color:#EF4444;"><h:outputText value="#{adminDashboardBean.ticketsSlaEnDanger.size()}"/></strong>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">Score sante systeme</span>
+                    <span class="badge #{adminDashboardBean.healthScore >= 70 ? 'bg-green' : (adminDashboardBean.healthScore >= 50 ? 'bg-warn' : 'bg-red')}">
+                        <h:outputText value="#{adminDashboardBean.healthScore}"/>/100
+                    </span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">Satisfaction utilisateurs</span>
+                    <strong><h:outputText value="#{adminDashboardBean.tauxSatisfactionGlobalFormatted}"/>%</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tickets critiques -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Tickets critiques</span>
+            <span style="font-size:12px;color:#64748B;background:#F1F5F9;padding:3px 10px;border-radius:20px;">
+                <h:outputText value="#{adminDashboardBean.ticketsCritiques.size()}"/> ticket(s)
+            </span>
+        </div>
+        <table class="itsm-table">
+            <thead><tr><th>#</th><th>Titre</th><th>Statut</th><th>Technicien</th><th>SLA</th></tr></thead>
+            <tbody>
+            <ui:repeat value="#{adminDashboardBean.ticketsCritiques}" var="t">
+                <tr>
+                    <td style="color:#94A3B8;">#<h:outputText value="#{t.id}"/></td>
+                    <td><a href="#{request.contextPath}/admin/tickets.xhtml" style="color:#4F46E5;text-decoration:none;font-weight:500;"><h:outputText value="#{t.titre}"/></a></td>
+                    <td><span class="badge badge-prio-#{t.priorite}"><h:outputText value="#{t.priorite}"/></span></td>
+                    <td>
+                        <h:panelGroup rendered="#{t.technicien != null}">
+                            <h:outputText value="#{t.technicien.prenom}"/> <h:outputText value="#{t.technicien.nom}"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{t.technicien == null}">
+                            <span style="color:#94A3B8;">Non assigne</span>
+                        </h:panelGroup>
+                    </td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <div class="sla-bar" style="width:80px;margin:0;">
+                                <div class="sla-fill" style="width:#{t.slaPercent}%;background:#{t.slaPercent>=80?'#EF4444':(t.slaPercent>=50?'#F59E0B':'#10B981')};"></div>
+                            </div>
+                            <span style="font-size:12px;color:#64748B;"><h:outputText value="#{t.slaPercent}"/>%</span>
+                        </div>
+                    </td>
+                </tr>
+            </ui:repeat>
+            <c:if test="#{empty adminDashboardBean.ticketsCritiques}">
+                <tr><td colspan="5" style="text-align:center;padding:30px;color:#94A3B8;">Aucun ticket critique</td></tr>
+            </c:if>
+            </tbody>
+        </table>
+    </div>
+</ui:define>
+</ui:composition>
+</html>

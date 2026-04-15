@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<ui:composition template="/WEB-INF/templates/layoutManager.xhtml">
+<ui:define name="title">Mon profil - Manager - ITSM</ui:define>
+<style>
+.page-header{background:#fff;padding:24px;border-radius:15px;margin-bottom:25px;}
+.page-title{font-size:22px;font-weight:700;color:#1E293B;margin-bottom:4px;}
+.page-subtitle{font-size:13px;color:#6D28D9;}
+.profile-layout{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start;}
+.card{background:#fff;border-radius:15px;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #E2E8F0;overflow:hidden;margin-bottom:20px;}
+.card-header{padding:20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;}
+.card-title{font-size:14px;font-weight:600;color:#1E293B;}
+.card-body{padding:24px;}
+.avatar-large{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.profile-name{font-size:20px;font-weight:700;color:#1E293B;text-align:center;}
+.profile-role{text-align:center;margin-top:6px;}
+.profile-email{font-size:13px;color:#64748B;text-align:center;margin-top:8px;}
+.badge-role-manager{display:inline-block;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;text-transform:uppercase;background:#EDE9FE;color:#7C3AED;}
+.form-group{margin-bottom:18px;}
+.form-label{display:block;font-size:12px;font-weight:700;color:#7C3AED;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;}
+.form-control{width:100%;padding:10px 14px;font-size:14px;border:1.5px solid #DDD6FE;border-radius:8px;background:#fff;color:#333;outline:none;transition:border .2s;}
+.form-control:focus{border-color:#7C3AED;}
+.form-control:disabled{background:#F8FAFC;color:#94A3B8;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;border:none;cursor:pointer;transition:all .2s;text-decoration:none;text-transform:uppercase;}
+.btn-primary{background:#6366F1;color:#fff;border:1px solid #4F46E5;}
+.btn-primary:hover{transform:scale(1.03);}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.stat-item{background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border-radius:10px;padding:14px;text-align:center;}
+.stat-value{font-size:24px;font-weight:800;color:#7C3AED;}
+.stat-label{font-size:11px;color:#6D28D9;font-weight:600;text-transform:uppercase;margin-top:4px;}
+@media(max-width:768px){.profile-layout{grid-template-columns:1fr;} .form-row{grid-template-columns:1fr;}}
+</style>
+<ui:define name="breadcrumb">
+    <a href="#{request.contextPath}/manager/dashboard.xhtml" style="color:var(--text-muted);text-decoration:none;">Dashboard</a>
+    &#160;/&#160; <strong>Mon profil</strong>
+</ui:define>
+<ui:define name="content">
+    <div class="page-header">
+        <div class="page-title">Mon profil Manager</div>
+        <div class="page-subtitle">Gérez vos informations personnelles</div>
+    </div>
+    <div class="profile-layout">
+        <div>
+            <div class="card">
+                <div class="card-body" style="text-align:center;">
+                    <div class="avatar-large">
+                        <h:outputText value="#{loginBean.user.prenom != null ? loginBean.user.prenom.substring(0,1).toUpperCase() : 'M'}"/>
+                    </div>
+                    <div class="profile-name"><h:outputText value="#{loginBean.user.prenom}"/> <h:outputText value="#{loginBean.user.nom}"/></div>
+                    <div class="profile-role"><span class="badge-role-manager">Manager IT</span></div>
+                    <div class="profile-email"><h:outputText value="#{loginBean.user.email}"/></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-title">Vue d'ensemble</div></div>
+                <div class="card-body">
+                    <div class="stat-grid">
+                        <div class="stat-item"><div class="stat-value"><h:outputText value="#{managerDashboardBean.totalTickets}"/></div><div class="stat-label">Total tickets</div></div>
+                        <div class="stat-item"><div class="stat-value"><h:outputText value="#{managerDashboardBean.ticketsEscalade}"/></div><div class="stat-label">Escalades</div></div>
+                        <div class="stat-item"><div class="stat-value"><h:outputText value="#{managerDashboardBean.tauxSlaFormatted}"/>%</div><div class="stat-label">SLA</div></div>
+                        <div class="stat-item"><div class="stat-value"><h:outputText value="#{managerDashboardBean.changementsPendants}"/></div><div class="stat-label">Changements</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header"><div class="card-title">Modifier mes informations</div></div>
+            <div class="card-body">
+                <h:form>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">Prénom</label><h:inputText value="#{loginBean.user.prenom}" styleClass="form-control"/></div>
+                        <div class="form-group"><label class="form-label">Nom</label><h:inputText value="#{loginBean.user.nom}" styleClass="form-control"/></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Email</label><h:inputText value="#{loginBean.user.email}" styleClass="form-control" disabled="true"/></div>
+                    <div class="form-group"><label class="form-label">Département</label><h:inputText value="#{loginBean.user.departement}" styleClass="form-control"/></div>
+                    <h:commandButton value="Enregistrer" action="#{userBean.updateProfile}" styleClass="btn btn-primary"/>
+                </h:form>
+            </div>
+        </div>
+    </div>
+</ui:define>
+</ui:composition>
+</html>

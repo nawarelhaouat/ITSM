@@ -1,0 +1,178 @@
+<ui:composition template="/WEB-INF/templates/layoutDeclarant.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+
+        <!-- HEADER -->
+        <div class="dashboard-header">
+            <h2>Bienvenue #{sessionScope.user.prenom} #{sessionScope.user.nom}</h2>
+        </div>
+
+        <!-- KPI -->
+        <div class="kpi-container">
+            <div class="kpi-card">
+                <h3>#{ticketBean.totalTickets}</h3>
+                <p>Tickets totaux</p>
+            </div>
+
+            <div class="kpi-card">
+                <h3>#{ticketBean.ticketsEnCours}</h3>
+                <p>En cours</p>
+            </div>
+
+            <div class="kpi-card">
+                <h3>#{ticketBean.ticketsResolus}</h3>
+                <p>Résolus</p>
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="actions-container">
+            <h:link outcome="/user/mes-tickets" styleClass="action-card">
+                <h3>Mes Tickets</h3>
+                <p>Consulter mes tickets</p>
+            </h:link>
+
+            <h:link outcome="/user/nouveau-ticket" styleClass="action-card">
+                <h3>Créer Ticket</h3>
+                <p>Signaler un problème</p>
+            </h:link>
+
+            <h:link outcome="/user/profil" styleClass="action-card">
+                <h3>Profil</h3>
+                <p>Gérer mes infos</p>
+            </h:link>
+        </div>
+
+        <!-- TABLE -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Derniers tickets</span>
+            </div>
+
+            <div class="card-body">
+                <table class="itsm-table">
+                    <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Priorité</th>
+                        <th>Statut</th>
+                        <th>Détails</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <ui:repeat value="#{ticketBean.mesTickets}" var="t">
+                        <tr>
+                            <td>#{t.titre}</td>
+
+                            <td>
+                                <span class="badge badge-prio-#{t.priorite}">
+                                    #{t.priorite}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="badge badge-status-#{t.statut}">
+                                    #{t.statut}
+                                </span>
+                            </td>
+
+                            <td>
+                                <button class="btn btn-sm btn-primary"
+                                        data-id="#{t.id}"
+                                        data-titre="#{t.titre}"
+                                        data-priorite="#{t.priorite}"
+                                        data-statut="#{t.statut}"
+                                        data-description="#{t.description}"
+                                        data-date="#{t.dateCreation}"
+                                        onclick="openModal(this)">
+                                    Voir
+                                </button>
+                            </td>
+                        </tr>
+                    </ui:repeat>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MODAL -->
+        <div id="ticketModal" class="modal-overlay" style="display:none;">
+            <div class="modal-box">
+
+                <div class="modal-header">
+                    <span class="modal-title">Détails du ticket</span>
+                    <button class="modal-close" onclick="closeModal()">✖</button>
+                </div>
+
+                <div class="modal-body">
+
+                    <p><strong>ID :</strong> <span id="modal-id"></span></p>
+
+                    <p><strong>Titre :</strong></p>
+                    <div class="modal-box-field" id="modal-titre"></div>
+
+                    <p><strong>Description :</strong></p>
+                    <div class="modal-box-field" id="modal-description"></div>
+
+                    <p><strong>Priorité :</strong>
+                        <span id="modal-priorite" class="badge"></span>
+                    </p>
+
+                    <p><strong>Statut :</strong>
+                        <span id="modal-statut" class="badge"></span>
+                    </p>
+
+                    <p><strong>Date :</strong>
+                        <span id="modal-date"></span>
+                    </p>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">Fermer</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- JS -->
+        <script>
+            function openModal(btn) {
+                document.getElementById("modal-id").innerText = btn.dataset.id;
+                document.getElementById("modal-titre").innerText = btn.dataset.titre;
+                document.getElementById("modal-description").innerText = btn.dataset.description;
+                document.getElementById("modal-date").innerText = btn.dataset.date;
+
+                let prio = btn.dataset.priorite;
+                let statut = btn.dataset.statut;
+
+                let prioElem = document.getElementById("modal-priorite");
+                prioElem.innerText = prio;
+                prioElem.className = "badge badge-prio-" + prio;
+
+                let statutElem = document.getElementById("modal-statut");
+                statutElem.innerText = statut;
+                statutElem.className = "badge badge-status-" + statut;
+
+                document.getElementById("ticketModal").style.display = "flex";
+            }
+
+            function closeModal() {
+                document.getElementById("ticketModal").style.display = "none";
+            }
+
+            window.onclick = function(event) {
+                let modal = document.getElementById("ticketModal");
+                if (event.target === modal) {
+                    closeModal();
+                }
+            }
+        </script>
+
+    </ui:define>
+</ui:composition>

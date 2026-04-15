@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition template="/WEB-INF/templates/layoutManager.xhtml">
+<ui:define name="title">Problèmes - Manager - ITSM</ui:define>
+<style>
+.page-header{background:#fff;padding:24px;border-radius:15px;margin-bottom:25px;}
+.page-title{font-size:22px;font-weight:700;color:#1E293B;margin-bottom:4px;}
+.page-subtitle{font-size:13px;color:#6D28D9;}
+.card{background:#fff;border-radius:15px;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #E2E8F0;overflow:hidden;margin-bottom:20px;}
+.card-header{display:flex;justify-content:space-between;align-items:center;padding:20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;}
+.card-title{font-size:14px;font-weight:600;color:#1E293B;}
+.itsm-table{width:100%;border-collapse:collapse;}
+.itsm-table thead tr{background:linear-gradient(135deg,#F5F3FF,#EDE9FE);}
+.itsm-table th{padding:13px 15px;text-align:left;font-size:11px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:.5px;}
+.itsm-table tbody tr{border-bottom:1px solid #F5F3FF;transition:background .2s;}
+.itsm-table tbody tr:hover{background:#F5F3FF;}
+.itsm-table td{padding:13px 15px;font-size:13px;vertical-align:middle;}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
+.badge-ouvert{background:#DEEBFF;color:#0052CC;} .badge-investigation{background:#EAE6FF;color:#6554C0;}
+.badge-solution{background:#E3FCEF;color:#006644;} .badge-cloture{background:#F4F5F7;color:#6B778C;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;border:none;cursor:pointer;transition:all .2s;text-decoration:none;text-transform:uppercase;}
+.btn-primary{background:#6366F1;color:#fff;border:1px solid #4F46E5;}
+.btn-secondary{background:#fff;color:#475569;border:1px solid #E2E8F0;}
+.btn-sm{padding:5px 10px;font-size:11px;}
+.text-muted{color:#94A3B8;} .text-sm{font-size:12px;}
+.empty-state{text-align:center;padding:40px 20px;}
+.empty-title{font-size:14px;font-weight:700;color:#7C3AED;}
+.modal-overlay{position:fixed;inset:0;background:rgba(9,30,66,.5);display:flex;align-items:center;justify-content:center;z-index:200;padding:24px;}
+.modal-box{background:#fff;border-radius:16px;width:100%;max-width:600px;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;}
+.modal-header{padding:16px 20px;border-bottom:1px solid #EDE9FE;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#F5F3FF,#EDE9FE);}
+.modal-title{font-size:15px;font-weight:700;color:#7C3AED;}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:#94A3B8;}
+.modal-body{padding:20px;}
+.modal-footer{padding:14px 20px;border-top:1px solid #EDE9FE;display:flex;justify-content:flex-end;gap:8px;}
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:12px;font-weight:700;color:#7C3AED;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;}
+.form-control{width:100%;padding:10px 14px;font-size:14px;border:1.5px solid #DDD6FE;border-radius:8px;background:#fff;color:#333;outline:none;}
+textarea.form-control{resize:vertical;min-height:80px;}
+</style>
+<ui:define name="breadcrumb">
+    <a href="#{request.contextPath}/manager/dashboard.xhtml" style="color:var(--text-muted);text-decoration:none;">Dashboard</a>
+    &#160;/&#160; <strong>Problèmes</strong>
+</ui:define>
+<ui:define name="content">
+    <div class="page-header">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+                <div class="page-title">Gestion des Problèmes</div>
+                <div class="page-subtitle">Supervision des causes racines et des solutions définitives</div>
+            </div>
+            <button class="btn btn-primary" onclick="document.getElementById('modalProbleme').style.display='flex'">+ Nouveau problème</button>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Liste des problèmes</span>
+            <span class="badge" style="background:#EDE9FE;color:#7C3AED;font-size:13px;padding:6px 14px;"><h:outputText value="#{problemeBean.allProblemes.size()}"/> problème(s)</span>
+        </div>
+        <table class="itsm-table">
+            <thead><tr><th>#</th><th>Titre</th><th>Statut</th><th>Cause Racine</th><th>Workaround</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody>
+            <ui:repeat value="#{problemeBean.allProblemes}" var="p">
+                <tr>
+                    <td><span class="text-muted text-sm">#<h:outputText value="#{p.id}"/></span></td>
+                    <td><span style="font-weight:600;color:#7C3AED;"><h:outputText value="#{p.titre}"/></span></td>
+                    <td>
+                        <span class="badge badge-#{p.statut == 'OUVERT' ? 'ouvert' : (p.statut == 'EN_INVESTIGATION' ? 'investigation' : (p.statut == 'SOLUTION_IDENTIFIEE' ? 'solution' : 'cloture'))}">
+                            <h:outputText value="#{p.statut}"/>
+                        </span>
+                    </td>
+                    <td>
+                        <h:panelGroup rendered="#{p.causeRacine != null and p.causeRacine != ''}"><span class="text-sm"><h:outputText value="#{p.causeRacine}"/></span></h:panelGroup>
+                        <h:panelGroup rendered="#{p.causeRacine == null or p.causeRacine == ''}"><span class="text-muted text-sm">—</span></h:panelGroup>
+                    </td>
+                    <td>
+                        <h:panelGroup rendered="#{p.workaround != null and p.workaround != ''}"><span class="text-sm" style="color:#10B981;font-weight:600;">Disponible</span></h:panelGroup>
+                        <h:panelGroup rendered="#{p.workaround == null or p.workaround == ''}"><span class="text-muted text-sm">Non défini</span></h:panelGroup>
+                    </td>
+                    <td><span class="text-muted text-sm"><h:outputText value="#{p.dateCreation}"><f:convertDateTime pattern="dd/MM/yyyy"/></h:outputText></span></td>
+                    <td>
+                        <h:form>
+                            <h:selectOneMenu value="#{problemeBean.updateStatut}" styleClass="btn btn-secondary btn-sm" style="border-radius:8px;font-size:11px;padding:4px 8px;">
+                                <f:selectItem itemValue="" itemLabel="Statut..."/>
+                                <f:selectItem itemValue="EN_INVESTIGATION" itemLabel="En investigation"/>
+                                <f:selectItem itemValue="SOLUTION_IDENTIFIEE" itemLabel="Solution identifiée"/>
+                                <f:selectItem itemValue="CLOTURE" itemLabel="Clôturer"/>
+                            </h:selectOneMenu>
+                            <h:commandButton value="OK" action="#{problemeBean.updateStatutProbleme(p.id)}" styleClass="btn btn-primary btn-sm"/>
+                        </h:form>
+                    </td>
+                </tr>
+            </ui:repeat>
+            <c:if test="#{empty problemeBean.allProblemes}">
+                <tr><td colspan="7"><div class="empty-state"><div class="empty-title">Aucun problème enregistré</div></div></td></tr>
+            </c:if>
+            </tbody>
+        </table>
+    </div>
+    <!-- Modal -->
+    <div id="modalProbleme" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-title">Nouveau problème</span>
+                <button class="modal-close" onclick="document.getElementById('modalProbleme').style.display='none'">✕</button>
+            </div>
+            <h:form>
+                <div class="modal-body">
+                    <div class="form-group"><label class="form-label">Titre *</label><h:inputText value="#{problemeBean.nouveauTitre}" styleClass="form-control" placeholder="Titre..."/></div>
+                    <div class="form-group"><label class="form-label">Description</label><h:inputTextarea value="#{problemeBean.nouvelleDescription}" styleClass="form-control" rows="3"/></div>
+                    <div class="form-group"><label class="form-label">Cause Racine (RCA)</label><h:inputTextarea value="#{problemeBean.nouvelleCauseRacine}" styleClass="form-control" rows="3" placeholder="Cause identifiée..."/></div>
+                    <div class="form-group"><label class="form-label">Workaround</label><h:inputTextarea value="#{problemeBean.nouveauWorkaround}" styleClass="form-control" rows="2" placeholder="Solution temporaire..."/></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('modalProbleme').style.display='none'">Annuler</button>
+                    <h:commandButton value="Créer" action="#{problemeBean.creerProbleme}" styleClass="btn btn-primary"/>
+                </div>
+            </h:form>
+        </div>
+    </div>
+</ui:define>
+</ui:composition>
+</html>

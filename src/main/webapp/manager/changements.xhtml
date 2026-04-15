@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition template="/WEB-INF/templates/layoutManager.xhtml">
+<ui:define name="title">Changements - Manager - ITSM</ui:define>
+<style>
+.page-header{background:#fff;padding:24px;border-radius:15px;margin-bottom:25px;}
+.page-title{font-size:22px;font-weight:700;color:#1E293B;margin-bottom:4px;}
+.page-subtitle{font-size:13px;color:#047857;}
+.card{background:#fff;border-radius:15px;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #E2E8F0;overflow:hidden;margin-bottom:20px;}
+.card-header{display:flex;justify-content:space-between;align-items:center;padding:20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;}
+.card-title{font-size:14px;font-weight:600;color:#1E293B;}
+.itsm-table{width:100%;border-collapse:collapse;}
+.itsm-table thead tr{background:linear-gradient(135deg,#ECFDF5,#D1FAE5);}
+.itsm-table th{padding:13px 15px;text-align:left;font-size:11px;font-weight:700;color:#065F46;text-transform:uppercase;letter-spacing:.5px;}
+.itsm-table tbody tr{border-bottom:1px solid #ECFDF5;transition:background .2s;}
+.itsm-table tbody tr:hover{background:#F0FDF9;}
+.itsm-table td{padding:13px 15px;font-size:13px;vertical-align:middle;}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
+.badge-impact-BAS{background:#D1FAE5;color:#065F46;} .badge-impact-MOYEN{background:#FEF9C3;color:#92400E;} .badge-impact-ELEVE{background:#FEE2E2;color:#DC2626;}
+.badge-risque-FAIBLE{background:#D1FAE5;color:#065F46;} .badge-risque-MOYEN{background:#FEF9C3;color:#92400E;} .badge-risque-ELEVE{background:#FEE2E2;color:#DC2626;}
+.badge-statut-BROUILLON{background:#F1F5F9;color:#64748B;} .badge-statut-SOUMIS{background:#DBEAFE;color:#1D4ED8;} .badge-statut-EN_REVUE{background:#FEF9C3;color:#92400E;}
+.badge-statut-APPROUVE{background:#D1FAE5;color:#065F46;} .badge-statut-REJETE{background:#FEE2E2;color:#DC2626;} .badge-statut-IMPLEMENTE{background:#EDE9FE;color:#6D28D9;} .badge-statut-CLOTURE{background:#F4F5F7;color:#6B778C;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;border:none;cursor:pointer;transition:all .2s;text-decoration:none;text-transform:uppercase;}
+.btn-success{background:#10B981;color:#fff;border:1px solid #059669;}
+.btn-success:hover{transform:scale(1.05);}
+.btn-danger{background:#EF4444;color:#fff;border:1px solid #DC2626;}
+.btn-primary{background:#6366F1;color:#fff;border:1px solid #4F46E5;}
+.btn-secondary{background:linear-gradient(135deg,#ECFDF5,#D1FAE5);color:#065F46;}
+.btn-sm{padding:5px 10px;font-size:11px;}
+.empty-state{text-align:center;padding:40px 20px;}
+.empty-title{font-size:14px;font-weight:700;color:#065F46;}
+.text-muted{color:#94A3B8;} .text-sm{font-size:12px;}
+.modal-overlay{position:fixed;inset:0;background:rgba(9,30,66,.5);display:flex;align-items:center;justify-content:center;z-index:200;padding:24px;}
+.modal-box{background:#fff;border-radius:16px;width:100%;max-width:650px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal-header{padding:16px 20px;border-bottom:1px solid #D1FAE5;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#ECFDF5,#D1FAE5);position:sticky;top:0;}
+.modal-title{font-size:15px;font-weight:700;color:#065F46;}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:#94A3B8;}
+.modal-body{padding:20px;}
+.modal-footer{padding:14px 20px;border-top:1px solid #D1FAE5;display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:#fff;}
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:12px;font-weight:700;color:#065F46;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;}
+.form-control{width:100%;padding:10px 14px;font-size:14px;border:1.5px solid #A7F3D0;border-radius:8px;background:#fff;color:#333;outline:none;transition:border .2s;}
+.form-control:focus{border-color:#065F46;}
+textarea.form-control{resize:vertical;min-height:80px;}
+select.form-control{cursor:pointer;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.detail-field{background:#F0FDF9;border:1px solid #D1FAE5;border-radius:8px;padding:12px;margin-bottom:12px;}
+.detail-label{font-size:11px;font-weight:700;color:#047857;text-transform:uppercase;margin-bottom:4px;}
+.detail-value{font-size:13px;color:#1E293B;}
+</style>
+<ui:define name="breadcrumb">
+    <a href="#{request.contextPath}/manager/dashboard.xhtml" style="color:var(--text-muted);text-decoration:none;">Dashboard</a>
+    &#160;/&#160; <strong>Changements</strong>
+</ui:define>
+<ui:define name="content">
+    <div class="page-header">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+                <div class="page-title">Gestion des Changements</div>
+                <div class="page-subtitle">Workflow d'approbation des demandes de changement IT</div>
+            </div>
+            <button class="btn btn-success" onclick="document.getElementById('modalNouveauChangement').style.display='flex'">
+                + Nouvelle demande
+            </button>
+        </div>
+    </div>
+
+    <!-- En attente d'approbation -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">En attente d'approbation</span>
+            <span class="badge" style="background:#FEF9C3;color:#92400E;font-size:13px;padding:6px 14px;">
+                <h:outputText value="#{changementBean.changementsSoumis.size()}"/> en attente
+            </span>
+        </div>
+        <table class="itsm-table">
+            <thead><tr><th>#</th><th>Titre</th><th>Impact</th><th>Risque</th><th>Statut</th><th>Demandeur</th><th>Date exec.</th><th>Actions</th></tr></thead>
+            <tbody>
+            <ui:repeat value="#{changementBean.changementsSoumis}" var="cr">
+                <tr>
+                    <td><span class="text-muted text-sm">#<h:outputText value="#{cr.id}"/></span></td>
+                    <td>
+                        <span style="font-weight:600;color:#065F46;cursor:pointer;" onclick="viewChangement(#{cr.id})">
+                            <h:outputText value="#{cr.titre}"/>
+                        </span>
+                    </td>
+                    <td><span class="badge badge-impact-#{cr.impact}"><h:outputText value="#{cr.impact}"/></span></td>
+                    <td><span class="badge badge-risque-#{cr.risque}"><h:outputText value="#{cr.risque}"/></span></td>
+                    <td><span class="badge badge-statut-#{cr.statut}"><h:outputText value="#{cr.statut}"/></span></td>
+                    <td><h:outputText value="#{cr.demandeur.prenom}"/> <h:outputText value="#{cr.demandeur.nom}"/></td>
+                    <td><span class="text-muted text-sm"><h:outputText value="#{cr.dateExecution}"><f:convertDateTime pattern="dd/MM/yyyy HH:mm"/></h:outputText></span></td>
+                    <td style="display:flex;gap:6px;">
+                        <h:form>
+                            <h:inputHidden value="#{changementBean.selectedId}" id="crId_#{cr.id}"/>
+                            <h:commandButton value="Approuver" action="#{changementBean.approuver(cr.id)}" styleClass="btn btn-success btn-sm"/>
+                        </h:form>
+                        <h:form>
+                            <h:commandButton value="Rejeter" action="#{changementBean.rejeter(cr.id)}" styleClass="btn btn-danger btn-sm"
+                                             onclick="return confirm('Rejeter cette demande ?');"/>
+                        </h:form>
+                    </td>
+                </tr>
+            </ui:repeat>
+            <c:if test="#{empty changementBean.changementsSoumis}">
+                <tr><td colspan="8"><div class="empty-state"><div style="font-size:40px;margin-bottom:12px;"></div><div class="empty-title">Aucune demande en attente</div></div></td></tr>
+            </c:if>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Toutes les demandes -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Toutes les demandes de changement</span>
+            <span class="badge" style="background:#D1FAE5;color:#065F46;font-size:13px;padding:6px 14px;">
+                <h:outputText value="#{changementBean.allChangements.size()}"/> demande(s)
+            </span>
+        </div>
+        <table class="itsm-table">
+            <thead><tr><th>#</th><th>Titre</th><th>Impact</th><th>Risque</th><th>Statut</th><th>Résultat</th><th>Date exec.</th></tr></thead>
+            <tbody>
+            <ui:repeat value="#{changementBean.allChangements}" var="cr">
+                <tr>
+                    <td><span class="text-muted text-sm">#<h:outputText value="#{cr.id}"/></span></td>
+                    <td><span style="font-weight:600;color:#065F46;"><h:outputText value="#{cr.titre}"/></span></td>
+                    <td><span class="badge"><h:outputText value="#{cr.impact}"/></span></td>
+                    <td><span class="badge"><h:outputText value="#{cr.risque}"/></span></td>
+                    <td><span class="badge"><h:outputText value="#{cr.statut}"/></span></td>
+                    <td>
+                        <h:panelGroup rendered="#{cr.resultat != null}">
+                            <span class="badge">
+                                <h:outputText value="#{cr.resultat}"/>
+                            </span>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{cr.resultat == null}"><span class="text-muted text-sm">—</span></h:panelGroup>
+                    </td>
+                    <td><span class="text-muted text-sm"><h:outputText value="#{cr.dateExecution}"><f:convertDateTime pattern="dd/MM/yyyy"/></h:outputText></span></td>
+                </tr>
+            </ui:repeat>
+            <c:if test="#{empty changementBean.allChangements}">
+                <tr><td colspan="7"><div class="empty-state"><div class="empty-title">Aucune demande de changement</div></div></td></tr>
+            </c:if>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal Nouveau Changement -->
+    <div id="modalNouveauChangement" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-title">Nouvelle demande de changement</span>
+                <button class="modal-close" onclick="document.getElementById('modalNouveauChangement').style.display='none'">✕</button>
+            </div>
+            <h:form>
+                <div class="modal-body">
+                    <div class="form-group"><label class="form-label">Titre <span style="color:red;">*</span></label><h:inputText value="#{changementBean.nouveauTitre}" styleClass="form-control" placeholder="Titre de la demande..."/></div>
+                    <div class="form-group"><label class="form-label">Description</label><h:inputTextarea value="#{changementBean.nouvelleDescription}" styleClass="form-control" rows="3"/></div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Impact</label>
+                            <h:selectOneMenu value="#{changementBean.nouvelImpact}" styleClass="form-control">
+                                <f:selectItem itemValue="BAS" itemLabel="BAS"/>
+                                <f:selectItem itemValue="MOYEN" itemLabel="MOYEN"/>
+                                <f:selectItem itemValue="ELEVE" itemLabel="ÉLEVÉ"/>
+                            </h:selectOneMenu>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Risque</label>
+                            <h:selectOneMenu value="#{changementBean.nouveauRisque}" styleClass="form-control">
+                                <f:selectItem itemValue="FAIBLE" itemLabel="FAIBLE"/>
+                                <f:selectItem itemValue="MOYEN" itemLabel="MOYEN"/>
+                                <f:selectItem itemValue="ELEVE" itemLabel="ÉLEVÉ"/>
+                            </h:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Plan de rollback</label><h:inputTextarea value="#{changementBean.nouveauPlanRollback}" styleClass="form-control" rows="2" placeholder="Procédure de rollback en cas d'échec..."/></div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">Date d'exécution</label><h:inputText value="#{changementBean.nouvelleDateExecution}" styleClass="form-control" type="datetime-local"/></div>
+                        <div class="form-group"><label class="form-label">Durée (min)</label><h:inputText value="#{changementBean.nouvelleDureeMinutes}" styleClass="form-control" type="number" placeholder="60"/></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('modalNouveauChangement').style.display='none'">Annuler</button>
+                    <h:commandButton value="Soumettre la demande" action="#{changementBean.creerChangement}" styleClass="btn btn-success"/>
+                </div>
+            </h:form>
+        </div>
+    </div>
+</ui:define>
+</ui:composition>
+</html>
