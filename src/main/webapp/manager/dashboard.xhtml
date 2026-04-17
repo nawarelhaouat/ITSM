@@ -4,6 +4,7 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 <ui:composition template="/WEB-INF/templates/layoutManager.xhtml">
 <ui:define name="title">Dashboard Manager - ITSM</ui:define>
+    <ui:define name="head-extra">
 <style>
     /* ===== BASE ===== */
     body {
@@ -123,12 +124,9 @@
 
     /* ===== BADGE ===== */
     .badge {
-        background: #f1f3f5;
         color: #343a40;
-        border: 1px solid #dee2e6;
-        padding: 3px 8px;
         font-size: 11px;
-        border-radius: 6px;
+        text-transform:uppercase;
     }
 
     /* ===== BUTTONS ===== */
@@ -172,9 +170,7 @@
         border-radius: 4px;
     }
 
-    .sla-bar-fill.ok { background: #adb5bd; }
-    .sla-bar-fill.warn { background: #6c757d; }
-    .sla-bar-fill.danger { background: #212529; }
+    .sla-bar-fill { background: #212529; }
 
     /* ===== TEXT ===== */
     .text-muted { color: #6c757d; }
@@ -216,7 +212,7 @@
     /* ===== RESPONSIVE ===== */
     .two-col {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 3fr 2fr;
         gap: 16px;
     }
 
@@ -226,12 +222,9 @@
         }
     }
 </style>
+    </ui:define>
 <ui:define name="breadcrumb"><strong>Tableau de bord</strong></ui:define>
 <ui:define name="content">
-    <div class="page-header">
-        <div class="page-title">Tableau de bord Manager</div>
-        <div class="page-subtitle">Vision globale du support IT — <h:outputText value="#{managerDashboardBean.lastUpdate}"/></div>
-    </div>
 
     <!-- KPIs -->
     <div class="kpi-grid">
@@ -260,7 +253,7 @@
                         <td><span class="badge"><h:outputText value="#{t.priorite}"/></span></td>
                         <td><span class="badge"><h:outputText value="#{t.statut}"/></span></td>
                         <td>
-                            <div class="sla-bar-track" style="width:70px;"><div class="sla-bar-fill #{t.slaPercent >= 80 ? 'danger' : (t.slaPercent >= 50 ? 'warn' : 'ok')}" style="width:#{t.slaPercent}%;"></div></div>
+                            <div class="sla-bar-track" style="width:70px;"><div class="sla-bar-fill" style="width:#{t.slaPercent}%;"></div></div>
                             <span class="text-muted text-sm"> <h:outputText value="#{t.slaPercent}"/>%</span>
                         </td>
                     </tr>
@@ -275,7 +268,7 @@
         <!-- Charge de travail techniciens -->
         <div class="card">
             <div class="card-header">
-                <span class="card-title">👥 Charge des techniciens</span>
+                <span class="card-title">Charge des techniciens</span>
             </div>
             <div style="padding:20px;">
                 <ui:repeat value="#{managerDashboardBean.chargeTechniciens}" var="ct">
@@ -302,7 +295,7 @@
     <div class="card">
         <div class="card-header">
             <span class="card-title">SLA en danger (≥ 80%)</span>
-            <span class="badge" style="background:#FEE2E2;color:#DC2626;font-size:13px;padding:6px 14px;">
+            <span class="badge">
                 <h:outputText value="#{managerDashboardBean.ticketsSlaEnDanger.size()}"/> alerte(s)
             </span>
         </div>
@@ -313,7 +306,7 @@
                 <tr>
                     <td><span class="text-muted text-sm">#<h:outputText value="#{t.id}"/></span></td>
                     <td><a href="#{request.contextPath}/manager/ticket-detail.xhtml?id=#{t.id}" style="color:#7C3AED;text-decoration:none;font-weight:600;"><h:outputText value="#{t.titre}"/></a></td>
-                    <td><span class="badge badge-prio-#{t.priorite}"><h:outputText value="#{t.priorite}"/></span></td>
+                    <td><span class="badge"><h:outputText value="#{t.priorite}"/></span></td>
                     <td>
                         <h:panelGroup rendered="#{t.technicien != null}">
                             <h:outputText value="#{t.technicien.prenom}"/> <h:outputText value="#{t.technicien.nom}"/>
@@ -321,11 +314,11 @@
                         <h:panelGroup rendered="#{t.technicien == null}"><span class="text-muted">Non assigné</span></h:panelGroup>
                     </td>
                     <td>
-                        <div class="sla-bar-track" style="width:80px;"><div class="sla-bar-fill danger" style="width:#{t.slaPercent}%;"></div></div>
-                        <span class="text-sm" style="color:#EF4444;"> <h:outputText value="#{t.slaPercent}"/>%</span>
+                        <div class="sla-bar-track" style="width:80px;"><div class="sla-bar-fill" style="width:#{t.slaPercent}%;"></div></div>
+                        <span class="text-sm"> <h:outputText value="#{t.slaPercent}"/>%</span>
                     </td>
                     <td><span class="text-sm text-muted"><h:outputText value="#{t.dateLimiteSla}"><f:convertDateTime pattern="dd/MM/yyyy HH:mm"/></h:outputText></span></td>
-                    <td><a href="#{request.contextPath}/manager/ticket-detail.xhtml?id=#{t.id}" class="btn btn-danger btn-sm">Voir</a></td>
+                    <td><a href="#{request.contextPath}/manager/ticket-detail.xhtml?id=#{t.id}">Voir</a></td>
                 </tr>
             </ui:repeat>
             <c:if test="#{empty managerDashboardBean.ticketsSlaEnDanger}">

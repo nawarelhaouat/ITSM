@@ -4,6 +4,7 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 <ui:composition template="/WEB-INF/templates/layoutManager.xhtml">
 <ui:define name="title">Problèmes - Manager - ITSM</ui:define>
+    <ui:define name="head-extra">
 <style>
 .page-header{background:#fff;padding:24px;border-radius:15px;margin-bottom:25px;}
 .page-title{font-size:22px;font-weight:700;color:#1E293B;margin-bottom:4px;}
@@ -17,9 +18,12 @@
 .itsm-table tbody tr{border-bottom:1px solid #F5F3FF;transition:background .2s;}
 .itsm-table tbody tr:hover{background:#F5F3FF;}
 .itsm-table td{padding:13px 15px;font-size:13px;vertical-align:middle;}
-.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
-.badge-ouvert{background:#DEEBFF;color:#0052CC;} .badge-investigation{background:#EAE6FF;color:#6554C0;}
-.badge-solution{background:#E3FCEF;color:#006644;} .badge-cloture{background:#F4F5F7;color:#6B778C;}
+/* ===== BADGE ===== */
+.badge {
+    color: #343a40;
+    font-size: 11px;
+    text-transform:uppercase;
+}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;border:none;cursor:pointer;transition:all .2s;text-decoration:none;text-transform:uppercase;}
 .btn-primary{background:#6366F1;color:#fff;border:1px solid #4F46E5;}
 .btn-secondary{background:#fff;color:#475569;border:1px solid #E2E8F0;}
@@ -39,13 +43,14 @@
 .form-control{width:100%;padding:10px 14px;font-size:14px;border:1.5px solid #DDD6FE;border-radius:8px;background:#fff;color:#333;outline:none;}
 textarea.form-control{resize:vertical;min-height:80px;}
 </style>
+    </ui:define>
 <ui:define name="breadcrumb">
     <a href="#{request.contextPath}/manager/dashboard.xhtml" style="color:var(--text-muted);text-decoration:none;">Dashboard</a>
     &#160;/&#160; <strong>Problèmes</strong>
 </ui:define>
 <ui:define name="content">
     <div class="page-header">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
             <div>
                 <div class="page-title">Gestion des Problèmes</div>
                 <div class="page-subtitle">Supervision des causes racines et des solutions définitives</div>
@@ -56,7 +61,7 @@ textarea.form-control{resize:vertical;min-height:80px;}
     <div class="card">
         <div class="card-header">
             <span class="card-title">Liste des problèmes</span>
-            <span class="badge" style="background:#EDE9FE;color:#7C3AED;font-size:13px;padding:6px 14px;"><h:outputText value="#{problemeBean.allProblemes.size()}"/> problème(s)</span>
+            <span class="badge" style="color:#7C3AED;font-size:13px;"><h:outputText value="#{problemeBean.allProblemes.size()}"/> problème(s)</span>
         </div>
         <table class="itsm-table">
             <thead><tr><th>#</th><th>Titre</th><th>Statut</th><th>Cause Racine</th><th>Workaround</th><th>Date</th><th>Action</th></tr></thead>
@@ -75,7 +80,7 @@ textarea.form-control{resize:vertical;min-height:80px;}
                         <h:panelGroup rendered="#{p.causeRacine == null or p.causeRacine == ''}"><span class="text-muted text-sm">—</span></h:panelGroup>
                     </td>
                     <td>
-                        <h:panelGroup rendered="#{p.workaround != null and p.workaround != ''}"><span class="text-sm" style="color:#10B981;font-weight:600;">Disponible</span></h:panelGroup>
+                        <h:panelGroup rendered="#{p.workaround != null and p.workaround != ''}"><span class="text-sm" style="font-weight:600;">Disponible</span></h:panelGroup>
                         <h:panelGroup rendered="#{p.workaround == null or p.workaround == ''}"><span class="text-muted text-sm">Non défini</span></h:panelGroup>
                     </td>
                     <td><span class="text-muted text-sm"><h:outputText value="#{p.dateCreation}"><f:convertDateTime pattern="dd/MM/yyyy"/></h:outputText></span></td>

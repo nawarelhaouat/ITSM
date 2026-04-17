@@ -8,6 +8,7 @@
     <f:viewParam name="id" value="#{managerTicketDetailBean.ticketId}"/>
     <f:viewAction action="#{managerTicketDetailBean.loadTicket}"/>
 </f:metadata>
+    <ui:define name="head-extra">
 <style>
 .page-header{background:#fff;padding:24px;border-radius:15px;margin-bottom:25px;}
 .page-title{font-size:24px;font-weight:700;color:#7C3AED;margin-bottom:6px;}
@@ -21,20 +22,19 @@
 .meta-item{padding:10px 0;border-bottom:1px solid #EDE9FE;}
 .meta-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94A3B8;margin-bottom:4px;}
 .meta-value{font-size:13.5px;color:#1E293B;}
-.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
-.badge-prio-CRITIQUE{background:linear-gradient(135deg,#FF6B6B,#FF4A5E);color:#fff;}
-.badge-prio-HAUTE{background:linear-gradient(135deg,#FFA500,#FFD700);color:#FF4500;}
-.badge-prio-MOYENNE{background:#87CEEB;color:#1565C0;}
-.badge-prio-BASSE{background:#90EE90;color:#228B22;}
-.badge-status-OUVERT{background:#DEEBFF;color:#0052CC;} .badge-status-ASSIGNE{background:#EAE6FF;color:#6554C0;}
-.badge-status-EN_COURS{background:#FFF0E6;color:#FF8B00;} .badge-status-ESCALADE{background:#FFEBE6;color:#DE350B;}
-.badge-status-RESOLU{background:#E3FCEF;color:#006644;} .badge-status-CLOTURE{background:#F4F5F7;color:#6B778C;}
-.sla-bar-wrap{margin-top:8px;}
-.sla-bar-track{width:100%;height:10px;background:#EDE9FE;border-radius:99px;overflow:hidden;}
-.sla-bar-fill{height:100%;border-radius:99px;}
-.sla-bar-fill.ok{background:linear-gradient(90deg,#10B981,#34D399);}
-.sla-bar-fill.warn{background:linear-gradient(90deg,#F59E0B,#FBBF24);}
-.sla-bar-fill.danger{background:linear-gradient(90deg,#EF4444,#F87171);}
+..badge {
+    color: #343a40;
+    font-size: 11px;
+    text-transform:uppercase;
+}
+/* ===== SLA ===== */
+.sla-bar-track {
+    background: #e9ecef;
+    height: 6px;
+    border-radius: 4px;
+}
+
+.sla-bar-fill { background: #212529; }
 .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:20px;font-size:13px;font-weight:700;border:none;cursor:pointer;transition:all .2s;text-decoration:none;text-transform:uppercase;width:100%;justify-content:center;margin-bottom:10px;}
 .btn-primary{background:#6366F1;color:#fff;border:1px solid #4F46E5;}
 .btn-primary:hover{transform:scale(1.03);}
@@ -68,6 +68,7 @@ select.form-control{cursor:pointer;}
 .text-muted{color:#94A3B8;} .text-sm{font-size:12px;}
 @media(max-width:768px){.detail-layout{grid-template-columns:1fr;}}
 </style>
+    </ui:define>
 <ui:define name="breadcrumb">
     <a href="#{request.contextPath}/manager/dashboard.xhtml" style="color:var(--text-muted);text-decoration:none;">Dashboard</a>
     &#160;/&#160;
@@ -76,7 +77,7 @@ select.form-control{cursor:pointer;}
 </ui:define>
 <ui:define name="content">
     <c:if test="#{managerTicketDetailBean.ticket == null}">
-        <div style="text-align:center;padding:60px;"><div style="font-size:48px;">❌</div><div style="font-size:16px;color:#7C3AED;font-weight:700;">Ticket introuvable</div></div>
+        <div style="text-align:center;padding:60px;"><div style="font-size:48px;"></div><div style="font-size:16px;color:#7C3AED;font-weight:700;">Ticket introuvable</div></div>
     </c:if>
     <c:if test="#{managerTicketDetailBean.ticket != null}">
         <div class="page-header">
@@ -86,8 +87,8 @@ select.form-control{cursor:pointer;}
                     <div class="page-subtitle">Ticket #<h:outputText value="#{managerTicketDetailBean.ticket.id}"/> — créé le <h:outputText value="#{managerTicketDetailBean.ticket.dateCreation}"><f:convertDateTime pattern="dd/MM/yyyy à HH:mm"/></h:outputText></div>
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    <span class="badge badge-prio-#{managerTicketDetailBean.ticket.priorite}" style="font-size:13px;padding:6px 14px;"><h:outputText value="#{managerTicketDetailBean.ticket.priorite}"/></span>
-                    <span class="badge badge-status-#{managerTicketDetailBean.ticket.statut}" style="font-size:13px;padding:6px 14px;"><h:outputText value="#{managerTicketDetailBean.ticket.statut}"/></span>
+                    <span class="badge" style="font-size:13px;padding:6px 14px;"><h:outputText value="#{managerTicketDetailBean.ticket.priorite}"/></span>
+                    <span class="badge" style="font-size:13px;padding:6px 14px;"><h:outputText value="#{managerTicketDetailBean.ticket.statut}"/></span>
                 </div>
             </div>
         </div>
@@ -96,7 +97,7 @@ select.form-control{cursor:pointer;}
             <div class="alert alert-success"><h:outputText value="#{managerTicketDetailBean.successMessage}"/></div>
         </c:if>
         <c:if test="#{managerTicketDetailBean.errorMessage != null}">
-            <div class="alert alert-danger">❌ <h:outputText value="#{managerTicketDetailBean.errorMessage}"/></div>
+            <div class="alert alert-danger"> <h:outputText value="#{managerTicketDetailBean.errorMessage}"/></div>
         </c:if>
 
         <div class="detail-layout">
@@ -123,7 +124,7 @@ select.form-control{cursor:pointer;}
                             <div class="meta-item" style="grid-column:span 2;">
                                 <div class="meta-label">SLA — <h:outputText value="#{managerTicketDetailBean.ticket.slaPercent}"/>% consommé</div>
                                 <div class="sla-bar-wrap">
-                                    <div class="sla-bar-track"><div class="sla-bar-fill #{managerTicketDetailBean.ticket.slaPercent >= 80 ? 'danger' : (managerTicketDetailBean.ticket.slaPercent >= 50 ? 'warn' : 'ok')}" style="width:#{managerTicketDetailBean.ticket.slaPercent}%;"></div></div>
+                                    <div class="sla-bar-track"><div class="sla-bar-fill" style="width:#{managerTicketDetailBean.ticket.slaPercent}%;"></div></div>
                                 </div>
                             </div>
                         </div>
@@ -163,8 +164,8 @@ select.form-control{cursor:pointer;}
                                     <div class="history-dot">⬤</div>
                                     <div class="history-text">
                                         <strong><h:outputText value="#{h.utilisateur.prenom}"/> <h:outputText value="#{h.utilisateur.nom}"/></strong> :
-                                        <span class="badge badge-status-#{h.ancienStatut}" style="font-size:10px;"><h:outputText value="#{h.ancienStatut}"/></span>
-                                        → <span class="badge badge-status-#{h.nouveauStatut}" style="font-size:10px;"><h:outputText value="#{h.nouveauStatut}"/></span>
+                                        <span class="badge" style="font-size:10px;"><h:outputText value="#{h.ancienStatut}"/></span>
+                                        → <span class="badge" style="font-size:10px;"><h:outputText value="#{h.nouveauStatut}"/></span>
                                         <span class="history-time"><h:outputText value="#{h.dateChangement}"><f:convertDateTime pattern="dd/MM/yyyy à HH:mm"/></h:outputText></span>
                                     </div>
                                 </div>
@@ -191,7 +192,7 @@ select.form-control{cursor:pointer;}
                                     </ui:repeat>
                                 </h:selectOneMenu>
                             </div>
-                            <h:commandButton value="Assigner" action="#{managerTicketDetailBean.assignerTicket}" styleClass="btn btn-success"/>
+                            <h:commandButton value="Assigner" action="#{managerTicketDetailBean.assignerTicket}" styleClass="btn btn-primary"/>
                         </h:form>
                         <hr style="border:none;border-top:1px solid #EDE9FE;margin:12px 0;"/>
                         <h:form>
@@ -206,7 +207,7 @@ select.form-control{cursor:pointer;}
                                     <f:selectItem itemValue="CLOTURE" itemLabel="Clôturé"/>
                                 </h:selectOneMenu>
                             </div>
-                            <h:commandButton value="✔ Appliquer" action="#{managerTicketDetailBean.changerStatut}" styleClass="btn btn-primary"/>
+                            <h:commandButton value="Appliquer" action="#{managerTicketDetailBean.changerStatut}" styleClass="btn btn-primary"/>
                         </h:form>
                     </div>
                 </div>
@@ -215,11 +216,11 @@ select.form-control{cursor:pointer;}
                     <div class="card-body">
                         <div class="meta-item">
                             <div class="meta-label">Consommé</div>
-                            <div class="meta-value" style="font-size:22px;font-weight:800;color:#{managerTicketDetailBean.ticket.slaPercent >= 80 ? '#EF4444' : '#10B981'};">
+                            <div class="meta-value" style="font-size:22px;font-weight:800;color:#{managerTicketDetailBean.ticket.slaPercent >= 80 ? '#212529' : '#212529'};">
                                 <h:outputText value="#{managerTicketDetailBean.ticket.slaPercent}"/>%
                             </div>
                         </div>
-                        <div class="sla-bar-wrap"><div class="sla-bar-track"><div class="sla-bar-fill #{managerTicketDetailBean.ticket.slaPercent >= 80 ? 'danger' : (managerTicketDetailBean.ticket.slaPercent >= 50 ? 'warn' : 'ok')}" style="width:#{managerTicketDetailBean.ticket.slaPercent}%;"></div></div></div>
+                        <div class="sla-bar-wrap"><div class="sla-bar-track"><div class="sla-bar-fill" style="width:#{managerTicketDetailBean.ticket.slaPercent}%;"></div></div></div>
                         <div class="meta-item" style="margin-top:12px;"><div class="meta-label">Échéance</div><div class="meta-value text-sm"><h:outputText value="#{managerTicketDetailBean.ticket.dateLimiteSla}"><f:convertDateTime pattern="dd/MM/yyyy HH:mm"/></h:outputText></div></div>
                     </div>
                 </div>

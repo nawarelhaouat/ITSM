@@ -4,6 +4,7 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 <ui:composition template="/WEB-INF/templates/layoutManager.xhtml">
 <ui:define name="title">Tickets - Manager - ITSM</ui:define>
+
     <ui:define name="head-extra">
 <style>
     /* TABLE COMPACTE + RESPONSIVE */
@@ -66,9 +67,12 @@
         height:5px;
     }
 
+    .sla-bar-fill { background: #212529; }
+
     /* BADGES plus compacts */
-    .badge{
-        font-size:11px;
+    .badge {\
+    color: #343a40;
+        font-size: 11px;
     }
 
     /* BUTTONS plus petits */
@@ -85,17 +89,12 @@
     }
 </style>
 </ui:define>
+
 <ui:define name="breadcrumb">
     <a href="#{request.contextPath}/manager/dashboard.xhtml" style="color:#64748B;text-decoration:none;">Dashboard</a>
     &#160;/&#160; <strong>Tickets</strong>
 </ui:define>
 <ui:define name="content">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <div>
-            <h1 style="font-size:22px;font-weight:700;color:#1E293B;margin:0;">Gestion des tickets</h1>
-            <p style="font-size:13px;color:#64748B;margin:4px 0 0;">Assignation et suivi de tous les tickets</p>
-        </div>
-    </div>
 
     <h:panelGroup rendered="#{managerTicketBean.successMessage != null}">
         <div class="alert alert-success"><h:outputText value="#{managerTicketBean.successMessage}"/></div>
@@ -128,7 +127,7 @@
                 <option value="BASSE">Basse</option>
             </select>
         </div>
-        <table class="itsm-ticket-table" id="tickTable">
+        <table class="itsm-table" id="tickTable">
             <thead>
                 <tr><th>#</th><th>Titre</th><th>Declarant</th><th>Priorite</th><th>Statut</th><th>Technicien</th><th>SLA</th><th>Date</th><th>Actions</th></tr>
             </thead>
@@ -158,29 +157,15 @@
                     <td>
                         <div class="sla-bar-wrap">
                             <div class="sla-bar-track">
-                                <div class="sla-bar-fill #{t.slaPercent >= 80 ? 'sla-danger' : (t.slaPercent >= 50 ? 'sla-warn' : 'sla-ok')}"
+                                <div class="sla-bar-fill"
                                      style="width:#{t.slaPercent}%;"></div>
                             </div>
                             <span class="text-muted"><h:outputText value="#{t.slaPercent}"/>%</span>
                         </div>
                     </td>
                     <td><span class="text-muted"><h:outputText value="#{t.dateCreation}"><f:convertDateTime pattern="dd/MM/yy"/></h:outputText></span></td>
-                    <td style="display:flex;gap:6px;flex-wrap:wrap;">
-                        <!-- Bouton Assigner via form JSF inline -->
-                        <h:form>
-                            <h:selectOneMenu value="#{managerTicketBean.selectedTechnicienId}"
-                                             styleClass="form-control">
-                                <f:selectItem itemValue="" itemLabel="Choisir..."/>
-                                <ui:repeat value="#{managerTicketBean.techniciens}" var="tech">
-                                    <f:selectItem itemValue="#{tech.id}" itemLabel="#{tech.prenom} #{tech.nom}"/>
-                                </ui:repeat>
-                            </h:selectOneMenu>
-
-                            <h:commandButton value="Assigner"
-                                             action="#{managerTicketBean.assignerTicketFromRow(t.id)}"
-                                             styleClass="btn btn-primary btn-sm"/>
-                        </h:form>
-                        <a href="#{request.contextPath}/manager/ticket-detail.xhtml?id=#{t.id}" class="btn btn-sm">Detail</a>
+                    <td>
+                        <a href="#{request.contextPath}/manager/ticket-detail.xhtml?id=#{t.id}" class="btn">Detail</a>
                     </td>
                 </tr>
             </ui:repeat>

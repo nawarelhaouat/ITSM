@@ -4,6 +4,7 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 <ui:composition template="/WEB-INF/templates/layoutManager.xhtml">
 <ui:define name="title">Rapports - Manager - ITSM</ui:define>
+    <ui:define name="head-extra">
 <style>
 .pg-title{font-size:22px;font-weight:700;color:#1E293B;margin:0 0 4px;}
 .pg-sub{font-size:13px;color:#64748B;margin-bottom:24px;}
@@ -19,10 +20,12 @@
 .bar-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #F8FAFC;}
 .bar-row:last-child{border:none;}
 .bar-label{font-size:13px;color:#334155;width:100px;flex-shrink:0;}
-.bar-track{flex:1;height:8px;background:#F1F5F9;border-radius:4px;overflow:hidden;}
-.bar-fill{height:100%;border-radius:4px;}
-.bar-fill.indigo{background:#6366F1;} .bar-fill.orange{background:#F59E0B;}
-.bar-fill.red{background:#EF4444;} .bar-fill.green{background:#10B981;}
+.bar-track {
+    background: #e9ecef;
+    height: 6px;
+    border-radius: 4px;
+}
+.bar-fill { background: #212529; }
 .bar-val{font-size:13px;font-weight:600;color:#1E293B;min-width:32px;text-align:right;}
 .stat-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F8FAFC;}
 .stat-row:last-child{border:none;}
@@ -31,12 +34,7 @@
 .itsm-table th{background:#F8FAFC;color:#64748B;font-size:11.5px;font-weight:600;text-transform:uppercase;padding:10px 14px;border-bottom:1px solid #E2E8F0;text-align:left;}
 .itsm-table td{padding:10px 14px;font-size:13px;border-bottom:1px solid #F1F5F9;color:#334155;vertical-align:middle;}
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;}
-.bg-green{background:#ECFDF5;color:#065F46;} .bg-warn{background:#FFFBEB;color:#D97706;} .bg-red{background:#FEF2F2;color:#DC2626;}
-.badge-prio-CRITIQUE{background:#FFEBE6;color:#DE350B;} .badge-prio-HAUTE{background:#FFF0E6;color:#FF8B00;}
-.badge-prio-MOYENNE{background:#FFFAE6;color:#FF991F;} .badge-prio-BASSE{background:#E3FCEF;color:#006644;}
-.badge-status-OUVERT{background:#DEEBFF;color:#0052CC;} .badge-status-ASSIGNE{background:#EAE6FF;color:#6554C0;}
-.badge-status-EN_COURS{background:#FFF0E6;color:#FF8B00;} .badge-status-ESCALADE{background:#FFEBE6;color:#DE350B;}
-.badge-status-RESOLU{background:#E3FCEF;color:#006644;} .badge-status-CLOTURE{background:#F4F5F7;color:#6B778C;}
+
 .sla-bar{width:100%;height:6px;background:#E2E8F0;border-radius:3px;overflow:hidden;margin-top:4px;}
 .sla-fill{height:100%;border-radius:3px;}
 .workload-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F8FAFC;}
@@ -45,14 +43,12 @@
 .chip-blue{background:#EEF2FF;color:#4338CA;} .chip-red{background:#FEF2F2;color:#DC2626;} .chip-green{background:#ECFDF5;color:#065F46;}
 @media(max-width:768px){.grid2{grid-template-columns:1fr;}}
 </style>
+    </ui:define>
 <ui:define name="breadcrumb">
     <a href="#{request.contextPath}/manager/dashboard.xhtml" style="color:#64748B;text-decoration:none;">Dashboard</a>
     &#160;/&#160; <strong>Rapports</strong>
 </ui:define>
 <ui:define name="content">
-    <div class="pg-title">Rapports et performances</div>
-    <div class="pg-sub">Analyse de l'activite du support IT — <h:outputText value="#{managerDashboardBean.lastUpdate}"/></div>
-
     <!-- KPIs -->
     <div class="kpi-grid">
         <div class="kpi-card">
@@ -93,7 +89,7 @@
                 <div class="bar-row">
                     <span class="bar-label">En cours</span>
                     <div class="bar-track">
-                        <div class="bar-fill orange"
+                        <div class="bar-fill"
                              style="width:#{managerDashboardBean.totalTickets > 0 ? (managerDashboardBean.ticketsEnCours * 100 / managerDashboardBean.totalTickets) : 0}%;"></div>
                     </div>
                     <span class="bar-val"><h:outputText value="#{managerDashboardBean.ticketsEnCours}"/></span>
@@ -101,7 +97,7 @@
                 <div class="bar-row">
                     <span class="bar-label">Escalades</span>
                     <div class="bar-track">
-                        <div class="bar-fill red"
+                        <div class="bar-fill"
                              style="width:#{managerDashboardBean.totalTickets > 0 ? (managerDashboardBean.ticketsEscalade * 100 / managerDashboardBean.totalTickets) : 0}%;"></div>
                     </div>
                     <span class="bar-val"><h:outputText value="#{managerDashboardBean.ticketsEscalade}"/></span>
@@ -109,7 +105,7 @@
                 <div class="bar-row">
                     <span class="bar-label">SLA danger</span>
                     <div class="bar-track">
-                        <div class="bar-fill red"
+                        <div class="bar-fill"
                              style="width:#{managerDashboardBean.totalTickets > 0 ? (managerDashboardBean.ticketsSlaEnDanger.size() * 100 / managerDashboardBean.totalTickets) : 0}%;"></div>
                     </div>
                     <span class="bar-val"><h:outputText value="#{managerDashboardBean.ticketsSlaEnDanger.size()}"/></span>
@@ -132,7 +128,7 @@
                 </div>
                 <div class="stat-row">
                     <span class="stat-name">Tickets en danger SLA</span>
-                    <strong style="color:#EF4444;"><h:outputText value="#{managerDashboardBean.ticketsSlaEnDanger.size()}"/></strong>
+                    <strong><h:outputText value="#{managerDashboardBean.ticketsSlaEnDanger.size()}"/></strong>
                 </div>
                 <div class="stat-row">
                     <span class="stat-name">Satisfaction utilisateurs</span>
@@ -161,9 +157,9 @@
                         <div style="font-size:12px;color:#94A3B8;"><h:outputText value="#{ct.email}"/></div>
                     </div>
                     <div>
-                        <span class="chip chip-blue"><h:outputText value="#{ct.ticketsEnCours}"/> en cours</span>
-                        <span class="chip chip-red"><h:outputText value="#{ct.ticketsEscalades}"/> esc.</span>
-                        <span class="chip chip-green"><h:outputText value="#{ct.ticketsResolus}"/> resolus</span>
+                        <span class="chip"><h:outputText value="#{ct.ticketsEnCours}"/> en cours</span>
+                        <span class="chip"><h:outputText value="#{ct.ticketsEscalades}"/> esc.</span>
+                        <span class="chip"><h:outputText value="#{ct.ticketsResolus}"/> resolus</span>
                     </div>
                 </div>
             </ui:repeat>
@@ -177,7 +173,7 @@
     <div class="card">
         <div class="card-header">
             <span class="card-title">Tickets SLA en danger</span>
-            <span style="font-size:12px;background:#FEF2F2;color:#DC2626;padding:3px 10px;border-radius:20px;font-weight:600;">
+            <span style="font-size:12px;font-weight:600;">
                 <h:outputText value="#{managerDashboardBean.ticketsSlaEnDanger.size()}"/> alerte(s)
             </span>
         </div>
@@ -193,7 +189,7 @@
                             <h:outputText value="#{t.titre}"/>
                         </a>
                     </td>
-                    <td><span class="badge badge-prio-#{t.priorite}"><h:outputText value="#{t.priorite}"/></span></td>
+                    <td><span class="badge"></span></td>
                     <td>
                         <h:panelGroup rendered="#{t.technicien != null}">
                             <h:outputText value="#{t.technicien.prenom}"/> <h:outputText value="#{t.technicien.nom}"/>
@@ -204,9 +200,9 @@
                         <div style="display:flex;align-items:center;gap:6px;">
                             <div class="sla-bar" style="width:80px;margin:0;">
                                 <div class="sla-fill"
-                                     style="width:#{t.slaPercent}%;background:#{t.slaPercent>=80?'#EF4444':'#F59E0B'};"></div>
+                                     style="width:#{t.slaPercent}%;background:#{t.slaPercent>=80?'#212529':'#212529'};"></div>
                             </div>
-                            <span style="font-size:12px;font-weight:600;color:#EF4444;"><h:outputText value="#{t.slaPercent}"/>%</span>
+                            <span style="font-size:12px;font-weight:600;"><h:outputText value="#{t.slaPercent}"/>%</span>
                         </div>
                     </td>
                     <td style="font-size:12px;color:#64748B;">

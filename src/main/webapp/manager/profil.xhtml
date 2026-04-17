@@ -3,6 +3,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 <ui:composition template="/WEB-INF/templates/layoutManager.xhtml">
 <ui:define name="title">Mon profil - Manager - ITSM</ui:define>
+    <ui:define name="head-extra">
 <style>
 .page-header{background:#fff;padding:24px;border-radius:15px;margin-bottom:25px;}
 .page-title{font-size:22px;font-weight:700;color:#1E293B;margin-bottom:4px;}
@@ -32,6 +33,7 @@
 .stat-label{font-size:11px;color:#6D28D9;font-weight:600;text-transform:uppercase;margin-top:4px;}
 @media(max-width:768px){.profile-layout{grid-template-columns:1fr;} .form-row{grid-template-columns:1fr;}}
 </style>
+    </ui:define>
 <ui:define name="breadcrumb">
     <a href="#{request.contextPath}/manager/dashboard.xhtml" style="color:var(--text-muted);text-decoration:none;">Dashboard</a>
     &#160;/&#160; <strong>Mon profil</strong>

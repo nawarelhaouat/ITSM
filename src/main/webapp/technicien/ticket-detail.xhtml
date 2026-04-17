@@ -8,6 +8,7 @@
     <f:viewParam name="id" value="#{technicienTicketDetailBean.ticketId}"/>
     <f:viewAction action="#{technicienTicketDetailBean.loadTicket}"/>
 </f:metadata>
+    <ui:define name="head-extra">
 <style>
 .page-header{background:#fff;padding:0 0 20px;margin-bottom:24px;border-bottom:1px solid #F1F5F9;}
 .page-title{font-size:24px;font-weight:700;color:#4338CA;margin-bottom:6px;}
@@ -21,20 +22,19 @@
 .meta-item{padding:10px 0;border-bottom:1px solid #EEF2FF;}
 .meta-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94A3B8;margin-bottom:4px;}
 .meta-value{font-size:13.5px;color:#1E293B;}
-.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;}
-.badge-prio-CRITIQUE{background:linear-gradient(135deg,#FF6B6B,#FF4A5E);color:#fff;}
-.badge-prio-HAUTE{background:linear-gradient(135deg,#FFA500,#FFD700);color:#FF4500;}
-.badge-prio-MOYENNE{background:#87CEEB;color:#1565C0;}
-.badge-prio-BASSE{background:#90EE90;color:#228B22;}
-.badge-status-OUVERT{background:#DEEBFF;color:#0052CC;} .badge-status-ASSIGNE{background:#EAE6FF;color:#6554C0;}
-.badge-status-EN_COURS{background:#FFF0E6;color:#FF8B00;} .badge-status-ESCALADE{background:#FFEBE6;color:#DE350B;}
-.badge-status-RESOLU{background:#E3FCEF;color:#006644;} .badge-status-CLOTURE{background:#F4F5F7;color:#6B778C;}
-.sla-bar-wrap{margin-top:8px;}
-.sla-bar-track{width:100%;height:10px;background:#EEF2FF;border-radius:99px;overflow:hidden;}
-.sla-bar-fill{height:100%;border-radius:99px;transition:width .4s;}
-.sla-bar-fill.ok{background:linear-gradient(90deg,#10B981,#34D399);}
-.sla-bar-fill.warn{background:linear-gradient(90deg,#F59E0B,#FBBF24);}
-.sla-bar-fill.danger{background:linear-gradient(90deg,#EF4444,#F87171);}
+.badge {
+    color: #343a40;
+    font-size: 11px;
+}
+.sla-bar-track {
+    background: #e9ecef;
+    height: 6px;
+    border-radius: 4px;
+}
+
+.sla-bar-fill.ok { background: #adb5bd; }
+.sla-bar-fill.warn { background: #6c757d; }
+.sla-bar-fill.danger { background: #212529; }
 .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:20px;font-size:13px;font-weight:700;border:none;cursor:pointer;transition:all .2s;text-decoration:none;text-transform:uppercase;width:100%;justify-content:center;margin-bottom:10px;}
 .btn-primary{background:#4F46E5;color:#fff;border:1px solid #4338CA;}
 .btn-primary:hover{transform:scale(1.03);box-shadow:0 4px 12px rgba(79,70,229,.3);}
@@ -73,6 +73,8 @@ select.form-control{cursor:pointer;}
 .history-time{font-size:11px;color:#94A3B8;display:block;margin-top:2px;}
 @media(max-width:768px){.detail-layout{grid-template-columns:1fr;}}
 </style>
+    </ui:define>
+
 <ui:define name="breadcrumb">
     <a href="#{request.contextPath}/technicien/dashboard.xhtml" style="color:var(--text-muted);text-decoration:none;">Dashboard</a>
     &#160;/&#160;
