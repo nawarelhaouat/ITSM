@@ -57,14 +57,9 @@ private List<Ticket> ticketsSlaEnDanger;
         System.out.println("[AdminDashboardBean] Constructeur appelé");
     }
 
-    /**
-     * Método llamada después del constructor - GARANTIZA que los datos se cargan
-     */
     @PostConstruct
     public void init() {
         System.out.println("[AdminDashboardBean] @PostConstruct init() appelé");
-        // Services are injected by CDI container - no need to instantiate
-        // Charger les données du dashboard
         loadDashboardData();
     }
 
@@ -72,7 +67,7 @@ private List<Ticket> ticketsSlaEnDanger;
      * Charge toutes les données du dashboard depuis la base de données
      */
     public void loadDashboardData() {
-        // Bloc 1 — statistiques générales
+        // statistiques générales
         try {
             System.out.println("[AdminDashboard] === DÉBUT CHARGEMENT DONNÉES ===");
 
@@ -119,7 +114,7 @@ private List<Ticket> ticketsSlaEnDanger;
             e.printStackTrace();
         }
 
-        // Bloc 2 — tickets récents (isolé)
+        // tickets récents (isolé)
         try {
             recentTickets = ticketService.getRecentTickets(10);
             System.out.println("[AdminDashboard] recentTickets size: " + (recentTickets != null ? recentTickets.size() : "NULL"));
@@ -128,7 +123,7 @@ private List<Ticket> ticketsSlaEnDanger;
             recentTickets = new java.util.ArrayList<>();
         }
 
-        // Bloc 3 — SLA en danger (isolé)
+        // SLA en danger (isolé)
         try {
             ticketsSlaEnDanger = ticketService.getTicketsSlaEnDanger(80);
             System.out.println("[AdminDashboard] ticketsSlaEnDanger size: " + (ticketsSlaEnDanger != null ? ticketsSlaEnDanger.size() : "NULL"));
@@ -137,7 +132,7 @@ private List<Ticket> ticketsSlaEnDanger;
             ticketsSlaEnDanger = new java.util.ArrayList<>();
         }
 
-        // Bloc 4 — utilisateurs (isolé)
+        // utilisateurs (isolé)
         try {
             totalUtilisateurs = userService.countActiveUsers();
             System.out.println("[AdminDashboard] totalUtilisateurs: " + totalUtilisateurs);

@@ -6,6 +6,7 @@ import org.jakartaee.itsm.DAO.UserDAO;
 import org.jakartaee.itsm.MODEL.User;
 
 import java.io.Serializable;
+import org.mindrot.jbcrypt.BCrypt;
 
 @Stateless
 public class UserService implements Serializable {
@@ -32,7 +33,7 @@ public class UserService implements Serializable {
             if (user.isActif()) {
                 // Vérifier le mot de passe
                 // Pour la démo, on compare directement (en production, utiliser du hashage)
-                if (user.getMotDePasse().equals(password)) {
+                if (BCrypt.checkpw(password, user.getMotDePasse())) {
                     System.out.println("[UserService] Mot de passe correct - Retour utilisateur");
                     return user;
                 } else {
@@ -60,6 +61,8 @@ public class UserService implements Serializable {
      */
     public boolean createUser(User user) {
         try {
+            String hashedPassword = BCrypt.hashpw(user.getMotDePasse(), BCrypt.gensalt());
+            user.setMotDePasse(hashedPassword);
             userDAO.save(user);
             return true;
         } catch (Exception e) {
